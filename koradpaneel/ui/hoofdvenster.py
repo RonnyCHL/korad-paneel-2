@@ -10,7 +10,7 @@ from __future__ import annotations
 import time
 from datetime import datetime
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QAction, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton,
                                QStackedWidget, QVBoxLayout, QWidget)
@@ -18,11 +18,13 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel, QMa
 from .. import VERSIE
 from ..kern import grenzen, instellingen
 from ..kern.geschiedenis import Energieteller, Geschiedenis, Meting
+from ..kern.logboek import CsvLog
 from ..voeding import poorten
 from ..voeding.basis import Stand, Voeding
 from ..werker import Werker
 from .eenvoudig import Eenvoudig, nl
 from .thema import THEMAS, qss
+from .uitgebreid import Uitgebreid
 
 INDELINGEN = [("eenvoudig", "Eenvoudig"), ("uitgebreid", "Uitgebreid"), ("meetbank", "Meetbank"),
               ("presentatie", "Presentatie")]
@@ -41,6 +43,7 @@ class Hoofdvenster(QMainWindow):
         self.voeding: Voeding | None = None
         self.geschiedenis = Geschiedenis()
         self.energie = Energieteller()
+        self.log = CsvLog()
         self.v_set = self.i_set = None
         self.uitgang = False
         self.laatste_grens_t = 0.0
@@ -94,12 +97,25 @@ class Hoofdvenster(QMainWindow):
         self.eenvoudig.uitgang.connect(self._uitgang)
         self.eenvoudig.geheugen.connect(self._geheugen)
         self.stapel.addWidget(self.eenvoudig)
-        for sleutel, naam in INDELINGEN[1:]:
-            w = QLabel(f"{naam}: komt in stap 2")
+        self.uitgebreid = Uitgebreid(self.thema, self.project.vmax, self.project.imax, self.inst["geheugens"],
+                                     self.geschiedenis)
+        self.uitgebreid.instellen.connect(self._zet)
+        self.uitgebreid.uitgang.connect(self._uitgang)
+        self.uitgebreid.geheugen.connect(self._geheugen)
+        self.uitgebreid.markering.connect(self.markeer)
+        self.uitgebreid.log.connect(self._log)
+        self.uitgebreid.k_nul.clicked.connect(lambda: self.energie.op_nul(time.time()))
+        self.stapel.addWidget(self.uitgebreid)
+        self.indelingen = [self.eenvoudig, self.uitgebreid]
+        for sleutel, naam in INDELINGEN[2:]:
+            w = QLabel(f"{naam}: komt in stap 2b")
             w.setObjectName("zacht")
             w.setAlignment(Qt.AlignCenter)
             self.stapel.addWidget(w)
         root.addWidget(self.stapel, 1)
+        self.tikker = QTimer(self)                    # de grafiek en de vensterstatistiek, 4x per seconde
+        self.tikker.timeout.connect(self._tik)
+        self.tikker.start(250)
 
         voet = QWidget()
         voet.setObjectName("voet")
@@ -187,17 +203,42 @@ class Hoofdvenster(QMainWindow):
     def _op_meting(self, m: Meting) -> None:
         self.geschiedenis.voeg(m)
         self.energie.tel(m)
-        self.eenvoudig.toon_meting(m)
+        self.log.schrijf(m)
+        for w in self.indelingen:
+            w.toon_meting(m)
         if self.energie.sinds:
             self.eenvoudig.toon_energie(self.energie.mah, datetime.fromtimestamp(self.energie.sinds).strftime("%H:%M"))
 
     def _op_stand(self, s: Stand) -> None:
         self.uitgang = s.uitgang
-        self.eenvoudig.toon_stand(s)
+        for w in self.indelingen:
+            w.toon_stand(s)
+
+    def _tik(self) -> None:
+        if self.stapel.currentWidget() is self.uitgebreid:
+            self.uitgebreid.ververs()
+            nu = time.time()
+            self.uitgebreid.toon_energie(self.energie, self.geschiedenis.venster(nu - self.uitgebreid.grafiek.venster_s, nu))
+
+    def markeer(self, tekst: str) -> None:
+        t = time.time()
+        self.uitgebreid.grafiek.markeer(t, tekst)
+        self.log.markeer(t, tekst)
+        self.l_voet.setText(f"markering {datetime.fromtimestamp(t):%H:%M:%S}: {tekst}")
+
+    def _log(self, aan: bool) -> None:
+        if aan:
+            pad = self.log.start()
+            self.l_voet.setText(f"log: {pad.name}")
+        else:
+            pad = self.log.stop()
+            self.l_voet.setText(f"log gesloten: {pad.name if pad else ''} ({self.log.regels} metingen)")
+        self.uitgebreid.toon_log(aan)
 
     def _op_instellingen(self, v: float, i: float) -> None:
         self.v_set, self.i_set = v, i
-        self.eenvoudig.toon_instellingen(v, i)
+        for w in self.indelingen:
+            w.toon_instellingen(v, i)
         # De voeding kan aan de voorkant hoger gezet zijn dan de grens: dan grijpt het paneel in.
         if self.uitgang and v > self.project.vmax + 0.005 and time.time() - self.laatste_grens_t > 3:
             self.laatste_grens_t = time.time()
@@ -246,7 +287,8 @@ class Hoofdvenster(QMainWindow):
         self.project = grenzen.project(self.c_project.itemData(idx))
         self.inst["project"] = self.project.sleutel
         instellingen.bewaar(self.inst)
-        self.eenvoudig.zet_grens(self.project.vmax, self.project.imax)
+        for w in self.indelingen:
+            w.zet_grens(self.project.vmax, self.project.imax)
         self._kies_indeling(self.inst["indeling"].get(self.project.sleutel, "eenvoudig"))
 
     def _kies_indeling(self, sleutel: str) -> None:
@@ -279,5 +321,6 @@ class Hoofdvenster(QMainWindow):
                 time.sleep(0.3)
         if self.werker is not None:
             self.werker.stop()
+        self.log.stop()
         instellingen.bewaar(self.inst)
         ev.accept()

@@ -10,12 +10,14 @@ from koradpaneel.voeding import nagebootst
 
 model = sys.argv[1] if len(sys.argv) > 1 else "tbeam"
 uit = sys.argv[2] if len(sys.argv) > 2 else "schermafdruk.png"
+indeling = sys.argv[3] if len(sys.argv) > 3 else "eenvoudig"
+wacht_ms = int(sys.argv[4]) if len(sys.argv) > 4 else 2500
 app = QApplication([])
 app.setStyle("Fusion")
 v = nagebootst.Nagebootst(model)
 v.v_set, v.i_set, v.uitgang = 5.0, 2.0, True
 venster = Hoofdvenster(lambda _p: v, inst={"project": "emsn", "thema": "donker", "poort": "",
-    "indeling": {"emsn": "eenvoudig"}, "geheugens": {"1": "3,3 V\n0,5 A", "2": "5 V\n1 A", "3": "12 V\n0,5 A", "4": "13,8 V\n0,5 A"}})
+    "indeling": {"emsn": indeling}, "geheugens": {"1": "3,3 V\n0,5 A", "2": "5 V\n1 A", "3": "12 V\n0,5 A", "4": "13,8 V\n0,5 A"}})
 venster.setAttribute(Qt.WA_DontShowOnScreen, True)
 venster.show()
 def klaar():
@@ -24,5 +26,11 @@ def klaar():
     venster.werker.stop()
     venster.werker = None          # anders vraagt closeEvent (modaal) of de uitgang uit mag
     app.quit()
-QTimer.singleShot(2500, klaar)
+def tussendoor():
+    venster.markeer("proef: markering")
+    v.zet_uitgang(False)
+    QTimer.singleShot(1500, lambda: v.zet_uitgang(True))
+if indeling == "uitgebreid":
+    QTimer.singleShot(max(500, wacht_ms // 2), tussendoor)
+QTimer.singleShot(wacht_ms, klaar)
 sys.exit(app.exec())

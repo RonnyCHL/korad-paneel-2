@@ -89,11 +89,12 @@ class RingMeter(QWidget):
         # de getallen
         p.setPen(QColor(t.inkt))
         tekst = self._nl(self.waarde, self.decimalen)
-        p.setFont(_font(t.cijfers, max(16, int(r * (0.36 if len(tekst) <= 4 else 0.3))), QFont.DemiBold))
-        p.drawText(QRectF(cx - r, cy - r * 0.45, 2 * r, r * 0.7), Qt.AlignCenter, tekst)
+        # cijfers schalen met de ring: in een kleine kaart (r ~ 60) past 5 tekens alleen rond 14 pt
+        p.setFont(_font(t.cijfers, max(11, int(r * (0.34 if len(tekst) <= 4 else 0.27))), QFont.DemiBold))
+        p.drawText(QRectF(cx - r, cy - r * 0.5, 2 * r, r * 0.7), Qt.AlignCenter, tekst)
         p.setPen(QColor(t.inkt_zacht))
-        p.setFont(_font(t.letters, max(10, int(r * 0.14))))
-        p.drawText(QRectF(cx - r, cy + r * 0.22, 2 * r, r * 0.3), Qt.AlignCenter, self.eenheid)
+        p.setFont(_font(t.letters, max(8, int(r * 0.13))))
+        p.drawText(QRectF(cx - r, cy + r * 0.26, 2 * r, r * 0.3), Qt.AlignCenter, self.eenheid)
         p.setPen(QColor(t.inkt_vaag))
         p.setFont(_font(t.letters, 9))
         p.drawText(QRectF(cx - r - 10, cy + r * 0.72, r * 0.8, 20), Qt.AlignLeft | Qt.AlignVCenter, "0")
