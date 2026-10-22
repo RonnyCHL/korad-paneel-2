@@ -18,16 +18,23 @@ Gebouwd en vastgelegd (zie `git log`):
    **Presentatie** (volledig scherm, alleen de meters, Esc = noodstop en terug) en het **Mini-venster** (altijd
    bovenop, met verloopgrafiekje en uit-knop).
 
+5. **Stap 2c**: bewaking (drie regels, zelfde bestand als het oude paneel), HTML-rapport van het zichtbare stuk
+   grafiek of van het stuk tussen de cursors (map `rapporten/`).
+6. **Stap 3a/3b**: testprogramma's: het JSON-formaat van het oude paneel (alle negen programma's staan in
+   `testprogrammas/` en laden ongewijzigd), hellingen, herhalen, verwachtingen per stap; het venster
+   Testprogramma's (Ctrl+P) met voorbeeldgrafiek; de loop draait in het paneel met markeringen per stap, de kaart
+   "Lopende proef", en een rapport met de uitslag na afloop. 27 toetsen.
+
 Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/schermafdruk.py tbeam uit.png
 [eenvoudig|uitgebreid|meetbank|presentatie] [ms]`.
 
 ## Nog te doen (volgorde)
 
-- Stap 2c: bewaking (drie regels), rapport (HTML) van een stuk grafiek, oude logs openen en vergelijken,
-  werkboek, geheugenknoppen met labels uit de voeding (SAV/RCL).
-- Stap 3: proeven als één systeem met een "apparaat onder test" (CaraVan Guard via wifi, EMSN-auto via de
-  seriële log); testprogramma's (JSON van het oude paneel inlezen), UPS-duurtest, ijken, spanningscontrole,
-  bouwstappen, opstartcurve, rooktest, nachttest, startproef bordje, onderdelentester.
+- Stap 2d: oude logs openen en vergelijken, werkboek, geheugenknoppen met labels uit de voeding (SAV/RCL),
+  accu nabootsen.
+- Stap 3c: het "apparaat onder test" (CaraVan Guard via wifi, EMSN-auto via de seriële log) en de proeven die
+  daarop leunen: UPS-duurtest, ijken, spanningscontrole, bouwstappen, opstartcurve, rooktest, nachttest,
+  startproef bordje, onderdelentester. Eerst de nagebootste monitor en het nagebootste bordje, dan de echte.
 - Stap 4: ntfy, spraak, telefoon-afstandsbediening, Ctrl+K zoekvenster, instellingenvenster, accu nabootsen 2.0,
   thema wisselen zonder herstart.
 - Stap 5: één .exe met icoon; handboek; overstap.
