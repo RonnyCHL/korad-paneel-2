@@ -8,50 +8,50 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 ## Verbinding en veiligheid
 
-- [ ] Poort kiezen (COM-lijst, Vernieuwen), verbinden, verbreken; `*IDN?` tonen (model, versie, serienummer).
+- [x] Poort kiezen (COM-lijst, Vernieuwen), verbinden, verbreken; `*IDN?` tonen (model, versie, serienummer).
 - [ ] De poort kan maar door één programma open zijn: duidelijke melding als een ander script hem heeft.
-- [ ] Grens per project (CaraVan Guard 15 V/4 A, EMSN-auto 5,5 V/2 A, Vrij 30 V/5 A): alles daarboven geweigerd
+- [x] Grens per project (CaraVan Guard 15 V/4 A, EMSN-auto 5,5 V/2 A, Vrij 30 V/5 A): alles daarboven geweigerd
       (instellen, geheugenknoppen, programma's, accusimulatie); hoger gezet aan de voorkant met uitgang aan →
       uitgang uit en alarm. Uitzondering: de TVS-meting van de onderdelentester (met stroomgrens ≤ 1,5 mA).
-- [ ] Esc = noodstop in elk venster: uitgang uit en alles stoppen.
+- [x] Esc = noodstop in elk venster: uitgang uit en alles stoppen.
 - [ ] Vangnet: bij sluiten met uitgang aan vragen; bij verbinden melden dat de uitgang nog aan stond; een
       onverwachte fout stopt de proef, zet de uitgang uit en schrijft `korad_fouten.log`.
-- [ ] Bij spanning verhogen terwijl de uitgang aan staat: bevestiging vragen.
-- [ ] Stroomgrens eerst, dan spanning, dan pas uitgang (volgorde van de commando's).
+- [x] Bij spanning verhogen terwijl de uitgang aan staat: bevestiging vragen.
+- [x] Stroomgrens eerst, dan spanning, dan pas uitgang (volgorde van de commando's).
 
 ## Meters en status
 
-- [ ] Ringmeters spanning, stroom, vermogen, met de waarde in het midden en de ingestelde waarde als merkteken.
-- [ ] CV/CC-lampjes, uitgang aan/uit, bewaking actief.
-- [ ] Energieteller sinds een moment (mAh, Wh, duur), op nul te zetten.
-- [ ] "Stroom in beeld": hoogste, gemiddelde, laagste, lading in het zichtbare venster (1, 5, 30 min).
+- [x] Ringmeters spanning, stroom, vermogen, met de waarde in het midden en de ingestelde waarde als merkteken.
+- [x] CV/CC-lampjes, uitgang aan/uit, bewaking actief.
+- [x] Energieteller sinds een moment (mAh, Wh, duur), op nul te zetten.
+- [x] "Stroom in beeld": hoogste, gemiddelde, laagste, lading in het zichtbare venster (1, 5, 30 min).
 - [ ] Piep bij langer dan een halve seconde begrenzen (CC), uit te zetten.
 - [ ] Scherp op schaal 150/200 % (DPI-bewust), vensters binnen het scherm houden.
 
 ## Bediening
 
-- [ ] Spanning en stroomgrens invullen en Instellen.
-- [ ] Uitgang aan/uit.
+- [x] Spanning en stroomgrens invullen en Instellen.
+- [x] Uitgang aan/uit.
 - [ ] Vier geheugenknoppen (M1–M4) met labels die uit de voeding gelezen worden na gebruik.
 - [ ] Accu nabootsen: van … V naar … V in … minuten met inwendige weerstand R (spanning zakt mee met de stroom).
-- [ ] Notitie als markering in grafiek, log en rapport.
-- [ ] Mini-venster, altijd bovenop: spanning, stroom, CC en een uit-knop.
+- [x] Notitie als markering in grafiek, log en rapport.
+- [x] Mini-venster, altijd bovenop: spanning, stroom, CC en een uit-knop.
 
 ## Grafiek en logboek
 
-- [ ] Grafiek spanning + stroom, meetcursor, slepen/scrollen om te zoomen, dubbelklik terug naar live; vensters
+- [x] Grafiek spanning + stroom, meetcursor, slepen/scrollen om te zoomen, dubbelklik terug naar live; vensters
       1 min, 5 min, 30 min.
-- [ ] Markeringen in de grafiek (eigen notities, stappen van programma's, meldingen van de monitor, grens).
-- [ ] CSV-log starten/stoppen (kolommen tijd, V, A, en monitor_V, monitor_A, ups_V als de monitor gekoppeld is).
+- [x] Markeringen in de grafiek (eigen notities, stappen van programma's, meldingen van de monitor, grens).
+- [x] CSV-log starten/stoppen (kolommen tijd, V, A, en monitor_V, monitor_A, ups_V als de monitor gekoppeld is).
 - [ ] Oude logs openen in de grafiek; logs vergelijken (twee over elkaar, tabel van verschillen, rapport).
-- [ ] HTML-rapport van een stuk grafiek (afdrukbaar als PDF).
+- [x] HTML-rapport van een stuk grafiek (afdrukbaar als PDF).
 - [ ] Werkboek: alles wat gemeten is op datum (soort, titel, bestand, uitleg), staafgrafiek per dag, zoeken,
       dubbelklik opent log of rapport; map scannen voor oude rapporten/logs.
 
 ## Bewaking
 
-- [ ] Drie regels: stroom/spanning/vermogen boven/onder een waarde gedurende … s → uitgang uit of waarschuwen.
-- [ ] Opgeslagen in `korad_bewaking.json`.
+- [x] Drie regels: stroom/spanning/vermogen boven/onder een waarde gedurende … s → uitgang uit of waarschuwen.
+- [x] Opgeslagen in `korad_bewaking.json`.
 
 ## Testprogramma's
 
@@ -101,7 +101,7 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 ## Overig
 
-- [ ] Instellingen in `korad_instellingen.json` (project, monitor, ntfy, geluid, web, spraak, rooktest, poorten).
+- [x] Instellingen in `korad_instellingen.json` (project, monitor, ntfy, geluid, web, spraak, rooktest, poorten).
 - [ ] Proef van het hele paneel met een nagebootste voeding en monitor (`tests/proef_paneel.py`, met
       belastingsmodellen: gewone belasting, print met LM2596, kortsluiting, lekstroom, diode, led, weerstand, TVS).
 - [ ] Handboek (PDF uit HTML, met voorbeeldschermen uit de nagebootste voeding).
@@ -109,8 +109,8 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 ## Nieuw in paneel 2 (afgesproken 22-10-2026)
 
-- [ ] Qt (PySide6); Korad-laag los, zodat een andere voeding erbij kan.
-- [ ] Indelingen: Eenvoudig, Uitgebreid, Meetbank, Presentatie, Mini; onthouden per project.
+- [x] Qt (PySide6); Korad-laag los, zodat een andere voeding erbij kan.
+- [x] Indelingen: Eenvoudig, Uitgebreid, Meetbank, Presentatie, Mini; onthouden per project.
 - [ ] Thema's donker/licht, accentkleur, kleurenblindveilig (status nooit alleen met kleur).
 - [ ] Toetsen: Esc noodstop, spatie uitgang, pijltjes spanning, cijfers geheugen; Ctrl+K zoekvenster.
 - [ ] Proeven als één systeem met een "apparaat onder test" (wifi of seriële log).
