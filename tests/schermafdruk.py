@@ -1,0 +1,28 @@
+"""Het paneel starten tegen de nagebootste voeding, even laten draaien en een schermafdruk maken (voor de bouw)."""
+import os, sys, time
+import faulthandler; faulthandler.dump_traceback_later(25, exit=True)
+# Het echte platform (lettertypen!), maar het venster komt niet op het scherm: WA_DontShowOnScreen.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QTimer, Qt
+from koradpaneel.ui.hoofdvenster import Hoofdvenster
+from koradpaneel.voeding import nagebootst
+
+model = sys.argv[1] if len(sys.argv) > 1 else "tbeam"
+uit = sys.argv[2] if len(sys.argv) > 2 else "schermafdruk.png"
+app = QApplication([])
+app.setStyle("Fusion")
+v = nagebootst.Nagebootst(model)
+v.v_set, v.i_set, v.uitgang = 5.0, 2.0, True
+venster = Hoofdvenster(lambda _p: v, inst={"project": "emsn", "thema": "donker", "poort": "",
+    "indeling": {"emsn": "eenvoudig"}, "geheugens": {"1": "3,3 V\n0,5 A", "2": "5 V\n1 A", "3": "12 V\n0,5 A", "4": "13,8 V\n0,5 A"}})
+venster.setAttribute(Qt.WA_DontShowOnScreen, True)
+venster.show()
+def klaar():
+    venster.grab().save(uit)
+    print("geschreven", uit, "| metingen", len(venster.geschiedenis), "| v_set", venster.v_set, "| uitgang", venster.uitgang)
+    venster.werker.stop()
+    venster.werker = None          # anders vraagt closeEvent (modaal) of de uitgang uit mag
+    app.quit()
+QTimer.singleShot(2500, klaar)
+sys.exit(app.exec())

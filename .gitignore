@@ -6,3 +6,4 @@ build/
 dist/
 *.log
 korad_instellingen.json
+schermafdruk*.png
