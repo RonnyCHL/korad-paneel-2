@@ -29,7 +29,20 @@ if os.environ.get("KP_PROEF"):
     venster._alarm = lambda tekst: print("ALARM:", tekst)
     webbrowser.open = lambda url: print("RAPPORT:", url)
     QTimer.singleShot(wacht_ms - 300, lambda: venster._rapport(time.time() - 60, time.time(), "Proef"))
+if os.environ.get("KP_PROGRAMMA"):
+    # een kort testprogramma draaien tegen de nagebootste voeding, met een verwachting
+    from koradpaneel.kern import programma as pr
+    import webbrowser
+    webbrowser.open = lambda url: print("RAPPORT:", url)
+    prog = pr.Programma(naam="proef kort", stappen=[
+        pr.Stap("sprong", 5.0, 1.0, "aan", 2.0, pr.Verwachting(i_min=50, i_max=150, na=0.5)),
+        pr.Stap("sprong", 5.0, 1.0, "uit", 1.0),
+        pr.Stap("helling", 3.0, 1.0, "aan", 2.0)])
+    QTimer.singleShot(600, lambda: venster._start_programma(prog))
+    QTimer.singleShot(2200, lambda: print("LOPEND:", venster.uitgebreid.l_proef_tekst.text()))
 def klaar():
+    if os.environ.get("KP_PROGRAMMA"):
+        print("UITSLAG:", venster.l_voet.text(), "| markeringen:", [m[1] for m in venster.uitgebreid.grafiek.markers][-6:])
     venster.grab().save(uit)
     print("geschreven", uit, "| metingen", len(venster.geschiedenis), "| v_set", venster.v_set, "| uitgang", venster.uitgang)
     venster.werker.stop()

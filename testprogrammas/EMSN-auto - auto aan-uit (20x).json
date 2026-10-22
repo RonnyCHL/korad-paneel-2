@@ -1,0 +1,408 @@
+{
+  "naam": "EMSN-auto - auto aan-uit (20x)",
+  "omschrijving": "Het bordje (T-Beam) op 5,00 V, stroomgrens 2 A, op de 5V-pin. Twintig keer 'auto uit' (5 s) en 'auto aan' (60 s), zoals twintig ritten. Per start hoort het bordje binnen 10 s minstens 100 mA te trekken; met een lege accu tot ~1,2 A. Of de I2C-bus goed of dood opkomt staat NIET in de stroom: dat telt emsn-auto/tools/labvoeding.py cyclus (leest de seriele log op COM6). Duur 22 min.",
+  "herhalen": 1,
+  "uit_na_afloop": true,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": 1600,
+        "na": 10,
+        "melding": "bordje leeft niet (onder 100 mA) of trekt te veel"
+      }
+    }
+  ]
+}

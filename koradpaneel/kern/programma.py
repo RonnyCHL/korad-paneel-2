@@ -171,6 +171,7 @@ class Loop:
         self.grens_v, self.grens_i = grens_v, grens_i
         self.idx = -1
         self.herhaling = 1
+        self.t_start = 0.0
         self.t_stap = 0.0
         self.v_van = 0.0
         self.v_laatst: float | None = None
@@ -194,6 +195,7 @@ class Loop:
         self._meldingen.append(tekst)
 
     def start(self, t: float) -> list[Opdracht]:
+        self.t_start = t
         if not self.p.stappen:
             self.klaar = True
             return []

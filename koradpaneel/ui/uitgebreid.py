@@ -174,12 +174,16 @@ class Uitgebreid(QWidget):
         self.balk.setFixedHeight(8)
         self.balk.setStyleSheet(f"QProgressBar {{ background: {thema.spoor}; border: 0; border-radius: 4px; }}"
                                 f"QProgressBar::chunk {{ background: {thema.accent}; border-radius: 4px; }}")
-        self.l_proef_tekst = QLabel("Proeven komen in stap 3.")
+        self.l_proef_tekst = QLabel("Kies een programma via het menu Proeven.")
         self.l_proef_tekst.setObjectName("zacht")
         self.l_proef_tekst.setWordWrap(True)
         for w in (self.l_proef_naam, self.balk, self.l_proef_tekst):
             lp.addWidget(w)
         lp.addStretch(1)
+        self.k_proef_stop = QPushButton("Stop")
+        self.k_proef_stop.setObjectName("geheugen")
+        self.k_proef_stop.setEnabled(False)
+        lp.addWidget(self.k_proef_stop, 0, Qt.AlignLeft)
         onder.addWidget(k_proef, 0, 1)
 
         k_bew, lw = kaart("Bewaking en notitie")
@@ -237,6 +241,14 @@ class Uitgebreid(QWidget):
     def _rapport(self) -> None:
         x0, x1 = self.grafiek.boven.getViewBox().viewRange()[0]
         self.rapport.emit(x0, x1)
+
+    def toon_proef(self, naam: str, voortgang: float, tekst: str, loopt: bool) -> None:
+        self.l_proef_naam.setText(naam)
+        self.balk.setValue(int(voortgang * 100))
+        self.l_proef_tekst.setText(tekst)
+        self.k_proef_stop.setEnabled(loopt)
+        self.l_proef.tekst = ("proef loopt · " + naam) if loopt else "geen proef"
+        self.l_proef.zet(loopt)
 
     def toon_bewaking(self, regels, actief: bool) -> None:
         aan = [r.tekst() for r in regels if r.aan]

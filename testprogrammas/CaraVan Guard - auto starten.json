@@ -1,0 +1,114 @@
+{
+  "naam": "CaraVan Guard - auto starten",
+  "omschrijving": "De 12 V uit de auto via de 13-polige stekker: 12,6 V met de motor uit, een dip naar 10,5 V bij het starten, de dynamo op 14,4 V, een slimme dynamo die terugzakt naar 12,8 V en bij het remmen even 14,8 V geeft, en tot slot de stekker eruit en er weer in. De monitor moet de dip overleven en '12 V weg' en '12 V terug' melden. Monitor koppelen voor de controles. Duur ongeveer 8 minuten.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 12.6,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 10.5,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "helling",
+      "v": 14.2,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 5
+    },
+    {
+      "overgang": "sprong",
+      "v": 14.4,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 90,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "helling",
+      "v": 12.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60
+    },
+    {
+      "overgang": "sprong",
+      "v": 12.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 5,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 14.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 20
+    },
+    {
+      "overgang": "sprong",
+      "v": 12.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 40,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 12.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 30,
+      "verwacht": {
+        "i_min": null,
+        "i_max": null,
+        "na": 2,
+        "melding": "12 V weg"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 90,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 30,
+        "melding": "12 V terug"
+      }
+    }
+  ]
+}

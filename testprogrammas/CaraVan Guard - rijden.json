@@ -1,0 +1,62 @@
+{
+  "naam": "CaraVan Guard - rijden",
+  "omschrijving": "Laadspanning van de auto: 14,4 V, kort 14,9 V (boven 14,8 V hoort de meter op het scherm rood te worden) en terug naar 13,8 V. Duur 6 minuten.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 14.4,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 120,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "helling",
+      "v": 14.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 30
+    },
+    {
+      "overgang": "sprong",
+      "v": 14.9,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60
+    },
+    {
+      "overgang": "sprong",
+      "v": 14.4,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60
+    },
+    {
+      "overgang": "helling",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 30
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 5,
+        "melding": ""
+      }
+    }
+  ]
+}

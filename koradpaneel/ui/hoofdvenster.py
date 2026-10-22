@@ -20,6 +20,7 @@ from .. import VERSIE
 from ..kern import grenzen, instellingen
 from ..kern.geschiedenis import Energieteller, Geschiedenis, Meting
 from ..kern import rapport as rapport_mod
+from ..kern import programma as pr
 from ..kern.bewaking import Bewaking
 from ..kern.logboek import CsvLog
 from ..voeding import poorten
@@ -30,6 +31,7 @@ from .eenvoudig import Eenvoudig, nl
 from .meetbank import Meetbank
 from .mini import Mini
 from .presentatie import Presentatie
+from .programmas import ProgrammaVenster
 from .thema import THEMAS, qss
 from .uitgebreid import Uitgebreid
 
@@ -53,6 +55,8 @@ class Hoofdvenster(QMainWindow):
         self.log = CsvLog()
         self.bewaking = Bewaking()
         self.bewaking.laad()
+        self.loop = None
+        self.laatste_meting = None
         self.v_set = self.i_set = None
         self.uitgang = False
         self.laatste_grens_t = 0.0
@@ -117,6 +121,7 @@ class Hoofdvenster(QMainWindow):
         self.uitgebreid.bewaking_instellen.connect(self._bewaking_dialoog)
         self.uitgebreid.rapport.connect(lambda a, b: self._rapport(a, b, "Grafiek in beeld"))
         self.uitgebreid.k_nul.clicked.connect(lambda: self.energie.op_nul(time.time()))
+        self.uitgebreid.k_proef_stop.clicked.connect(lambda: self._stop_programma("Gestopt"))
         self.uitgebreid.toon_bewaking(self.bewaking.regels, self.bewaking.actief)
         self.stapel.addWidget(self.uitgebreid)
         self.meetbank = Meetbank(self.thema, self.project.vmax, self.project.imax, self.geschiedenis)
@@ -172,7 +177,9 @@ class Hoofdvenster(QMainWindow):
         b.addSeparator()
         for sleutel, naam in (("donker", "Thema donker"), ("licht", "Thema licht")):
             b.addAction(naam, lambda s=sleutel: self._kies_thema(s))
-        self.menu.addMenu("Proeven").addAction("komt in stap 3").setEnabled(False)
+        pm = self.menu.addMenu("Proeven")
+        pm.addAction("Testprogramma's…", self._programmas).setShortcut(QKeySequence("Ctrl+P"))
+        pm.addAction("Programma stoppen", lambda: self._stop_programma("Gestopt"))
         self.menu.addMenu("Logboek").addAction("komt in stap 2").setEnabled(False)
         self.menu.addMenu("Gereedschap").addAction("komt in stap 3").setEnabled(False)
         self.menu.addMenu("Instellingen").addAction("komt in stap 4").setEnabled(False)
@@ -219,6 +226,7 @@ class Hoofdvenster(QMainWindow):
 
     # ---------------------------------------------------------------- uitlezing
     def _op_meting(self, m: Meting) -> None:
+        self.laatste_meting = m
         self.geschiedenis.voeg(m)
         self.energie.tel(m)
         self.log.schrijf(m)
@@ -241,7 +249,85 @@ class Hoofdvenster(QMainWindow):
         if self.mini is not None and self.mini.isVisible():
             self.mini.toon_stand(s)
 
+    # ---------------------------------------------------------------- testprogramma's
+    def _programmas(self) -> None:
+        d = ProgrammaVenster(self.thema, self.project.vmax, self)
+        d.setStyleSheet(qss(self.thema))
+        d.start.connect(self._start_programma)
+        d.exec()
+
+    def _start_programma(self, p: pr.Programma) -> None:
+        if self.werker is None:
+            QMessageBox.information(self, "Niet verbonden", "Verbind eerst met de voeding.")
+            return
+        self._stop_programma("Gestopt: nieuw programma")
+        self.loop = pr.Loop(p, self.project.vmax, self.project.imax)
+        self.markeer(f"programma: {p.naam}")
+        self._voer_uit(self.loop.start(time.time()))
+        self._toon_proef()
+
+    def _voer_uit(self, ops: list) -> None:
+        for o in ops:
+            if o.i is not None:
+                self._stuur(self.voeding.zet_stroomgrens, o.i)
+            if o.v is not None:
+                self._stuur(self.voeding.zet_spanning, o.v)
+            if o.uit is not None:
+                self._stuur(self.voeding.zet_uitgang, o.uit)
+            if o.markering:
+                self.markeer(o.markering)
+
+    def _toon_proef(self) -> None:
+        l = self.loop
+        if l is None:
+            self.uitgebreid.toon_proef("geen proef", 0.0, "Kies een programma via het menu Proeven.", False)
+            return
+        s = l.stap
+        g, f = l.samenvatting()
+        rest = int(max(0.0, l.p.duur * (1 - l.voortgang)))
+        delen = [f"stap {l.idx + 1} van {len(l.p.stappen)}"]
+        if l.p.herhalen > 1:
+            delen[0] += f", herhaling {l.herhaling} van {l.p.herhalen}"
+        if s is not None:
+            delen.append("uit" if not s.aan else nl(min(s.v, self.project.vmax), 2) + " V")
+        delen.append(f"nog ongeveer {rest // 60} min {rest % 60} s")
+        if g + f:
+            delen.append(f"{g} goed, {f} fout")
+        self.uitgebreid.toon_proef(l.p.naam, l.voortgang, " · ".join(delen), True)
+
+    def _stop_programma(self, reden: str, rapport: bool = False) -> None:
+        l, self.loop = self.loop, None
+        if l is None:
+            return
+        g, f = l.samenvatting()
+        uitslag = f"{reden}: {l.p.naam}" + (f" · {g} goed, {f} fout" if g + f else "")
+        self.markeer(uitslag)
+        if not l.klaar and l.p.uit_na_afloop:
+            self._uitgang(False)
+        self._toon_proef()
+        if rapport:
+            t1 = time.time()
+            pts = self.geschiedenis.tussen(l.t_start, t1)
+            markers = [(t, x) for t, x in self.uitgebreid.grafiek.markers if l.t_start <= t <= t1]
+            regels = []
+            for u in l.uitslagen:
+                kop = f"stap {u.stap}" + (f" (herhaling {u.herhaling})" if l.p.herhalen > 1 else "")
+                regels.append(f"{kop}: {u.tekst}")
+            pagina = rapport_mod.maak(l.p.naam, pts, markers, apparaat=self.l_apparaat.text(), project=self.project.naam,
+                                      v_set=self.v_set, i_set=self.i_set, oordeel=uitslag,
+                                      oordeel_klasse="fout" if f else "goed", toelichting="\n".join(regels),
+                                      soort="testprogramma")
+            pad = rapport_mod.bewaar(pagina, "programma")
+            self.l_voet.setText(f"rapport: {pad.name}")
+            webbrowser.open(pad.resolve().as_uri())
+
     def _tik(self) -> None:
+        if self.loop is not None:
+            self._voer_uit(self.loop.tik(time.time(), self.laatste_meting))
+            if self.loop.klaar:
+                self._stop_programma("Klaar", rapport=True)
+            else:
+                self._toon_proef()
         w = self.stapel.currentWidget()
         if w is self.uitgebreid:
             self.uitgebreid.ververs()
@@ -343,6 +429,7 @@ class Hoofdvenster(QMainWindow):
         self._stuur(self.voeding.geheugen_ophalen, n)
 
     def noodstop(self) -> None:
+        self._stop_programma("NOODSTOP")
         if self.werker is not None:
             self.werker.opdracht(self.voeding.zet_uitgang, False)
         self.l_voet.setText(f"NOODSTOP {datetime.now():%H:%M:%S}: uitgang uit")

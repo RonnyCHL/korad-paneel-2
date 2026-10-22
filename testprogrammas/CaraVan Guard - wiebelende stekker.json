@@ -1,0 +1,174 @@
+{
+  "naam": "CaraVan Guard - wiebelende stekker",
+  "omschrijving": "Een minuut lang kort uit en aan, zoals een losse stekker. Daarna drie minuten rust: de monitor moet doordraaien en de SD-kaart moet terugkomen (open punt 14; kijk op het scherm Systeem). Duur ruim 5 minuten.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 180,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 30,
+        "melding": ""
+      }
+    }
+  ]
+}

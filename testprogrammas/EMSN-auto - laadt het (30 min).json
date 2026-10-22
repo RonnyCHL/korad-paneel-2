@@ -1,0 +1,21 @@
+{
+  "naam": "EMSN-auto - laadt het (30 min)",
+  "omschrijving": "Het bordje op 5,00 V, grens 2 A, 30 minuten 'auto aan'. Laadt de 18650 met 1 A, dan hoort de stroom na 30 s boven 0,8 A te liggen (bordje ~0,2 A + laden ~1 A). Blijft hij rond 0,2 A, dan laadt het bordje NIET (de vraag van oktober 2026). Zakt hij in de loop van het half uur, dan raakt de accu vol. Duur 30 min.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 1800,
+      "verwacht": {
+        "i_min": 800,
+        "i_max": 1600,
+        "na": 30,
+        "melding": "laadt niet: alleen het eigen verbruik van het bordje"
+      }
+    }
+  ]
+}

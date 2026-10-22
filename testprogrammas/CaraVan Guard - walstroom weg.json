@@ -1,0 +1,99 @@
+{
+  "naam": "CaraVan Guard - walstroom weg",
+  "omschrijving": "De 12 V valt 20 s, 1 min en 10 min weg. Controleert of de monitor '12 V weg' en '12 V terug' meldt en op de UPS doordraait. Monitor koppelen voor de controles. Duur ruim 15 minuten.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 20,
+      "verwacht": {
+        "i_min": null,
+        "i_max": null,
+        "na": 2,
+        "melding": "12 V weg"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": null,
+        "i_max": null,
+        "na": 2,
+        "melding": "12 V terug"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 60,
+      "verwacht": {
+        "i_min": null,
+        "i_max": null,
+        "na": 2,
+        "melding": "12 V weg"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": null,
+        "i_max": null,
+        "na": 2,
+        "melding": "12 V terug"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "uit",
+      "duur": 600,
+      "verwacht": {
+        "i_min": null,
+        "i_max": null,
+        "na": 2,
+        "melding": "12 V weg"
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 120,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 30,
+        "melding": "12 V terug"
+      }
+    }
+  ]
+}

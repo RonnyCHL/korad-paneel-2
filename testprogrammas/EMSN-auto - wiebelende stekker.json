@@ -1,0 +1,174 @@
+{
+  "naam": "EMSN-auto - wiebelende stekker",
+  "omschrijving": "Zoals de oude autolader in augustus 2026: tien keer kort weg en terug. Het bordje hoort de rit NIET te sluiten (USB_WEG_BEVESTIG_MS = 5 s) en daarna gewoon door te meten; in de seriele log hoort 'USB was ... ms weg en is terug' te staan, geen 'rit-einde'. Duur ruim 4 min.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "uit",
+      "duur": 1
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 2
+    },
+    {
+      "overgang": "sprong",
+      "v": 5.0,
+      "i": 2.0,
+      "uit": "aan",
+      "duur": 180,
+      "verwacht": {
+        "i_min": 100,
+        "i_max": null,
+        "na": 30,
+        "melding": ""
+      }
+    }
+  ]
+}

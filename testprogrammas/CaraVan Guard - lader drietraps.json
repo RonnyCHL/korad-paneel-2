@@ -1,0 +1,74 @@
+{
+  "naam": "CaraVan Guard - lader drietraps",
+  "omschrijving": "Een drietrapslader aan de walstroom: 14,4 V (bulk en absorptie), langzaam naar 13,8 V (druppelladen) en 13,2 V (bewaarstand), daarna begint hij opnieuw op 14,4 V. De monitor moet alle spanningen netjes volgen zonder meldingen; de meter op het scherm blijft groen (tussen 11,8 en 14,8 V). Duur 10 minuten.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 14.4,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 180,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "helling",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 120,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 5,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "helling",
+      "v": 13.2,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.2,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 120,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 5,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "sprong",
+      "v": 14.4,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "naam": "CaraVan Guard - zakkende spanning",
+  "omschrijving": "Van 13,8 naar 11,0 V in twee minuten en weer terug, zoals een accu die leegloopt. Kijk wanneer het scherm oranje wordt (onder 11,8 V) en of de monitor blijft werken. Duur ruim 5 minuten.",
+  "herhalen": 1,
+  "uit_na_afloop": false,
+  "stappen": [
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 10,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "helling",
+      "v": 11.0,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 120
+    },
+    {
+      "overgang": "sprong",
+      "v": 11.0,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 5,
+        "melding": ""
+      }
+    },
+    {
+      "overgang": "helling",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 30
+    },
+    {
+      "overgang": "sprong",
+      "v": 13.8,
+      "i": 1.5,
+      "uit": "aan",
+      "duur": 60,
+      "verwacht": {
+        "i_min": 20,
+        "i_max": null,
+        "na": 5,
+        "melding": ""
+      }
+    }
+  ]
+}
