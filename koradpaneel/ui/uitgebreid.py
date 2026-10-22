@@ -37,6 +37,8 @@ class Uitgebreid(QWidget):
     geheugen = Signal(int)
     markering = Signal(str)
     log = Signal(bool)                 # log starten/stoppen
+    bewaking_instellen = Signal()
+    rapport = Signal(float, float)     # van, tot (het zichtbare venster)
 
     def __init__(self, thema: Thema, vmax: float, imax: float, geheugens: dict, geschiedenis: Geschiedenis):
         super().__init__()
@@ -119,7 +121,7 @@ class Uitgebreid(QWidget):
             self.k_venster[sec] = k
         self.k_rapport = QPushButton("Rapport")
         self.k_rapport.setObjectName("geheugen")
-        self.k_rapport.setEnabled(False)
+        self.k_rapport.clicked.connect(self._rapport)
         kop.addWidget(self.k_rapport)
         lg.addLayout(kop)
         self.grafiek = Grafiek(thema, geschiedenis)
@@ -181,7 +183,7 @@ class Uitgebreid(QWidget):
         onder.addWidget(k_proef, 0, 1)
 
         k_bew, lw = kaart("Bewaking en notitie")
-        self.l_bewaking = QLabel("Geen bewakingsregels (komt in stap 2b).")
+        self.l_bewaking = QLabel("Geen bewakingsregels.")
         self.l_bewaking.setObjectName("zacht")
         self.l_bewaking.setWordWrap(True)
         lw.addWidget(self.l_bewaking)
@@ -199,7 +201,7 @@ class Uitgebreid(QWidget):
         self.k_log.setObjectName("geheugen")
         self.k_bewaking = QPushButton("Bewaking instellen")
         self.k_bewaking.setObjectName("geheugen")
-        self.k_bewaking.setEnabled(False)
+        self.k_bewaking.clicked.connect(self.bewaking_instellen.emit)
         kn.addWidget(self.k_log)
         kn.addWidget(self.k_bewaking)
         kn.addStretch(1)
@@ -231,6 +233,16 @@ class Uitgebreid(QWidget):
         tekst = self.notitie.text().strip() or f"markering {len(self.grafiek.markers) + 1}"
         self.notitie.clear()
         self.markering.emit(tekst)
+
+    def _rapport(self) -> None:
+        x0, x1 = self.grafiek.boven.getViewBox().viewRange()[0]
+        self.rapport.emit(x0, x1)
+
+    def toon_bewaking(self, regels, actief: bool) -> None:
+        aan = [r.tekst() for r in regels if r.aan]
+        self.l_bewaking.setText(" · ".join(aan) if aan else "Geen bewakingsregels aan.")
+        self.l_bew.tekst = "bewaking aan" if actief else "bewaking uit"
+        self.l_bew.zet(actief)
 
     def _venster(self, sec: int) -> None:
         for s, k in self.k_venster.items():

@@ -42,6 +42,7 @@ class Tegel(QFrame):
 
 class Meetbank(QWidget):
     uitgang = Signal(bool)
+    rapport = Signal(float, float)
 
     def __init__(self, thema: Thema, vmax: float, imax: float, geschiedenis: Geschiedenis):
         super().__init__()
@@ -66,7 +67,7 @@ class Meetbank(QWidget):
         self.k_cursors = QPushButton("Cursors")
         self.k_export = QPushButton("Exporteer selectie")
         self.k_rapport = QPushButton("Rapport van dit stuk")
-        self.k_rapport.setEnabled(False)
+        self.k_rapport.clicked.connect(lambda: self.rapport.emit(*self.grafiek.ab()) if self.grafiek.cursors_aan else None)
         for k in (self.k_live, self.k_cursors, self.k_export, self.k_rapport):
             k.setObjectName("geheugen")
             kop.addWidget(k)

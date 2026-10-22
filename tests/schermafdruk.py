@@ -20,6 +20,15 @@ venster = Hoofdvenster(lambda _p: v, inst={"project": "emsn", "thema": "donker",
     "indeling": {"emsn": indeling}, "geheugens": {"1": "3,3 V\n0,5 A", "2": "5 V\n1 A", "3": "12 V\n0,5 A", "4": "13,8 V\n0,5 A"}})
 venster.setAttribute(Qt.WA_DontShowOnScreen, True)
 venster.show()
+if os.environ.get("KP_PROEF"):
+    # bewaking en rapport beproeven zonder vensters op het scherm
+    from koradpaneel.kern.bewaking import Regel
+    import webbrowser
+    venster.bewaking.regels[0] = Regel(True, "stroom", "boven", 50.0, 2.0, "waarschuwen")
+    venster.uitgebreid.toon_bewaking(venster.bewaking.regels, venster.bewaking.actief)
+    venster._alarm = lambda tekst: print("ALARM:", tekst)
+    webbrowser.open = lambda url: print("RAPPORT:", url)
+    QTimer.singleShot(wacht_ms - 300, lambda: venster._rapport(time.time() - 60, time.time(), "Proef"))
 def klaar():
     venster.grab().save(uit)
     print("geschreven", uit, "| metingen", len(venster.geschiedenis), "| v_set", venster.v_set, "| uitgang", venster.uitgang)

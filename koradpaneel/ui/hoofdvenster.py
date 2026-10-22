@@ -8,6 +8,7 @@ staat dan de grens terwijl de uitgang aan is. Esc is in elk venster de noodstop.
 from __future__ import annotations
 
 import time
+import webbrowser
 from datetime import datetime
 
 from PySide6.QtCore import Qt, QTimer
@@ -18,10 +19,13 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel, QMa
 from .. import VERSIE
 from ..kern import grenzen, instellingen
 from ..kern.geschiedenis import Energieteller, Geschiedenis, Meting
+from ..kern import rapport as rapport_mod
+from ..kern.bewaking import Bewaking
 from ..kern.logboek import CsvLog
 from ..voeding import poorten
 from ..voeding.basis import Stand, Voeding
 from ..werker import Werker
+from .bewaking_dialoog import BewakingDialoog
 from .eenvoudig import Eenvoudig, nl
 from .meetbank import Meetbank
 from .mini import Mini
@@ -47,6 +51,8 @@ class Hoofdvenster(QMainWindow):
         self.geschiedenis = Geschiedenis()
         self.energie = Energieteller()
         self.log = CsvLog()
+        self.bewaking = Bewaking()
+        self.bewaking.laad()
         self.v_set = self.i_set = None
         self.uitgang = False
         self.laatste_grens_t = 0.0
@@ -108,9 +114,13 @@ class Hoofdvenster(QMainWindow):
         self.uitgebreid.geheugen.connect(self._geheugen)
         self.uitgebreid.markering.connect(self.markeer)
         self.uitgebreid.log.connect(self._log)
+        self.uitgebreid.bewaking_instellen.connect(self._bewaking_dialoog)
+        self.uitgebreid.rapport.connect(lambda a, b: self._rapport(a, b, "Grafiek in beeld"))
         self.uitgebreid.k_nul.clicked.connect(lambda: self.energie.op_nul(time.time()))
+        self.uitgebreid.toon_bewaking(self.bewaking.regels, self.bewaking.actief)
         self.stapel.addWidget(self.uitgebreid)
         self.meetbank = Meetbank(self.thema, self.project.vmax, self.project.imax, self.geschiedenis)
+        self.meetbank.rapport.connect(lambda a, b: self._rapport(a, b, "Tussen cursor A en B"))
         self.stapel.addWidget(self.meetbank)
         self.presentatie = Presentatie(self.thema, self.project.vmax, self.project.imax, self.project.titel)
         self.stapel.addWidget(self.presentatie)
@@ -212,6 +222,11 @@ class Hoofdvenster(QMainWindow):
         self.geschiedenis.voeg(m)
         self.energie.tel(m)
         self.log.schrijf(m)
+        for g in self.bewaking.evalueer(m):
+            self.markeer(g.tekst)
+            if g.regel.actie == "uitgang uit":
+                self._uitgang(False)
+            self._alarm(g.tekst + (": uitgang uitgezet" if g.regel.actie == "uitgang uit" else ""))
         for w in self.indelingen:
             w.toon_meting(m)
         if self.mini is not None and self.mini.isVisible():
@@ -249,6 +264,32 @@ class Hoofdvenster(QMainWindow):
         self.meetbank.grafiek.markeer(t, tekst)
         self.log.markeer(t, tekst)
         self.l_voet.setText(f"markering {datetime.fromtimestamp(t):%H:%M:%S}: {tekst}")
+
+    def _alarm(self, tekst: str) -> None:
+        self.l_voet.setText(f"ALARM {datetime.now():%H:%M:%S}: {tekst}")
+        box = QMessageBox(QMessageBox.Warning, "Bewaking", tekst, QMessageBox.Ok, self)
+        box.setModal(False)
+        box.show()
+
+    def _bewaking_dialoog(self) -> None:
+        d = BewakingDialoog(self.bewaking, self)
+        d.setStyleSheet(qss(self.thema))
+        if d.exec():
+            self.uitgebreid.toon_bewaking(self.bewaking.regels, self.bewaking.actief)
+            self.eenvoudig.l_bew.tekst = "bewaking aan" if self.bewaking.actief else "bewaking uit"
+            self.eenvoudig.l_bew.zet(self.bewaking.actief)
+
+    def _rapport(self, van: float, tot: float, titel: str) -> None:
+        pts = self.geschiedenis.tussen(van, tot)
+        if len(pts) < 2:
+            QMessageBox.information(self, "Geen metingen", "Er zijn te weinig metingen in dit stuk.")
+            return
+        markers = [(t, x) for t, x in self.uitgebreid.grafiek.markers if van <= t <= tot]
+        pagina = rapport_mod.maak(titel, pts, markers, apparaat=self.l_apparaat.text(), project=self.project.naam,
+                                  v_set=self.v_set, i_set=self.i_set)
+        pad = rapport_mod.bewaar(pagina, "rapport")
+        self.l_voet.setText(f"rapport: {pad.name}")
+        webbrowser.open(pad.resolve().as_uri())
 
     def _log(self, aan: bool) -> None:
         if aan:
