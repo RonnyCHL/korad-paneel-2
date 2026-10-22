@@ -23,6 +23,9 @@ from ..voeding import poorten
 from ..voeding.basis import Stand, Voeding
 from ..werker import Werker
 from .eenvoudig import Eenvoudig, nl
+from .meetbank import Meetbank
+from .mini import Mini
+from .presentatie import Presentatie
 from .thema import THEMAS, qss
 from .uitgebreid import Uitgebreid
 
@@ -62,6 +65,7 @@ class Hoofdvenster(QMainWindow):
         root.setSpacing(0)
 
         kop = QWidget()
+        self.kop = kop
         kop.setObjectName("kop")
         kl = QHBoxLayout(kop)
         kl.setContentsMargins(24, 10, 24, 10)
@@ -106,18 +110,20 @@ class Hoofdvenster(QMainWindow):
         self.uitgebreid.log.connect(self._log)
         self.uitgebreid.k_nul.clicked.connect(lambda: self.energie.op_nul(time.time()))
         self.stapel.addWidget(self.uitgebreid)
-        self.indelingen = [self.eenvoudig, self.uitgebreid]
-        for sleutel, naam in INDELINGEN[2:]:
-            w = QLabel(f"{naam}: komt in stap 2b")
-            w.setObjectName("zacht")
-            w.setAlignment(Qt.AlignCenter)
-            self.stapel.addWidget(w)
+        self.meetbank = Meetbank(self.thema, self.project.vmax, self.project.imax, self.geschiedenis)
+        self.stapel.addWidget(self.meetbank)
+        self.presentatie = Presentatie(self.thema, self.project.vmax, self.project.imax, self.project.titel)
+        self.stapel.addWidget(self.presentatie)
+        self.indelingen = [self.eenvoudig, self.uitgebreid, self.meetbank, self.presentatie]
+        self.mini: Mini | None = None
+        self.vorige_indeling = "eenvoudig"
         root.addWidget(self.stapel, 1)
         self.tikker = QTimer(self)                    # de grafiek en de vensterstatistiek, 4x per seconde
         self.tikker.timeout.connect(self._tik)
         self.tikker.start(250)
 
         voet = QWidget()
+        self.voet = voet
         voet.setObjectName("voet")
         vl = QHBoxLayout(voet)
         vl.setContentsMargins(24, 8, 24, 8)
@@ -151,6 +157,8 @@ class Hoofdvenster(QMainWindow):
             a.triggered.connect(lambda _=False, s=sleutel: self._kies_indeling(s))
             b.addAction(a)
             self.a_indeling[sleutel] = a
+        b.addSeparator()
+        b.addAction("Mini-venster (altijd bovenop)", self._mini).setShortcut(QKeySequence("F5"))
         b.addSeparator()
         for sleutel, naam in (("donker", "Thema donker"), ("licht", "Thema licht")):
             b.addAction(naam, lambda s=sleutel: self._kies_thema(s))
@@ -206,6 +214,8 @@ class Hoofdvenster(QMainWindow):
         self.log.schrijf(m)
         for w in self.indelingen:
             w.toon_meting(m)
+        if self.mini is not None and self.mini.isVisible():
+            self.mini.toon_meting(m)
         if self.energie.sinds:
             self.eenvoudig.toon_energie(self.energie.mah, datetime.fromtimestamp(self.energie.sinds).strftime("%H:%M"))
 
@@ -213,16 +223,30 @@ class Hoofdvenster(QMainWindow):
         self.uitgang = s.uitgang
         for w in self.indelingen:
             w.toon_stand(s)
+        if self.mini is not None and self.mini.isVisible():
+            self.mini.toon_stand(s)
 
     def _tik(self) -> None:
-        if self.stapel.currentWidget() is self.uitgebreid:
+        w = self.stapel.currentWidget()
+        if w is self.uitgebreid:
             self.uitgebreid.ververs()
             nu = time.time()
             self.uitgebreid.toon_energie(self.energie, self.geschiedenis.venster(nu - self.uitgebreid.grafiek.venster_s, nu))
+        elif w is self.meetbank:
+            self.meetbank.ververs()
+
+    def _mini(self) -> None:
+        if self.mini is None:
+            self.mini = Mini(self.thema, self.project.naam)
+            self.mini.setStyleSheet(qss(self.thema))
+            self.mini.uit.connect(lambda: self._uitgang(False))
+        self.mini.show()
+        self.mini.raise_()
 
     def markeer(self, tekst: str) -> None:
         t = time.time()
         self.uitgebreid.grafiek.markeer(t, tekst)
+        self.meetbank.grafiek.markeer(t, tekst)
         self.log.markeer(t, tekst)
         self.l_voet.setText(f"markering {datetime.fromtimestamp(t):%H:%M:%S}: {tekst}")
 
@@ -281,6 +305,9 @@ class Hoofdvenster(QMainWindow):
         if self.werker is not None:
             self.werker.opdracht(self.voeding.zet_uitgang, False)
         self.l_voet.setText(f"NOODSTOP {datetime.now():%H:%M:%S}: uitgang uit")
+        if self.stapel.currentWidget() is self.presentatie:      # Esc in Presentatie: ook terug naar het paneel
+            self.showNormal()
+            self._kies_indeling(self.vorige_indeling)
 
     # ---------------------------------------------------------------- keuzes
     def _project_gekozen(self, idx: int) -> None:
@@ -295,11 +322,21 @@ class Hoofdvenster(QMainWindow):
         sleutels = [s for s, _ in INDELINGEN]
         if sleutel not in sleutels:
             sleutel = "eenvoudig"
+        huidig = sleutels[self.stapel.currentIndex()]
+        if huidig != "presentatie":
+            self.vorige_indeling = huidig
         self.stapel.setCurrentIndex(sleutels.index(sleutel))
         for s, a in self.a_indeling.items():
             a.setChecked(s == sleutel)
-        self.inst["indeling"][self.project.sleutel] = sleutel
-        instellingen.bewaar(self.inst)
+        self.kop.setVisible(sleutel != "presentatie")
+        self.voet.setVisible(sleutel != "presentatie")
+        if sleutel == "presentatie":
+            self.showFullScreen()
+        elif self.isFullScreen():
+            self.showNormal()
+        if sleutel != "presentatie":
+            self.inst["indeling"][self.project.sleutel] = sleutel
+            instellingen.bewaar(self.inst)
 
     def _kies_thema(self, sleutel: str) -> None:
         self.thema = THEMAS[sleutel]

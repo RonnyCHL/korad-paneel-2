@@ -30,7 +30,9 @@ def tussendoor():
     venster.markeer("proef: markering")
     v.zet_uitgang(False)
     QTimer.singleShot(1500, lambda: v.zet_uitgang(True))
-if indeling == "uitgebreid":
+if indeling in ("uitgebreid", "meetbank"):
     QTimer.singleShot(max(500, wacht_ms // 2), tussendoor)
+if indeling == "meetbank":
+    QTimer.singleShot(wacht_ms - 600, venster.meetbank._cursors)
 QTimer.singleShot(wacht_ms, klaar)
 sys.exit(app.exec())

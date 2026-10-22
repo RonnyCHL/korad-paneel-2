@@ -71,6 +71,55 @@ class Grafiek(QWidget):
         for w in (self.boven, self.onder):
             w.mouseDoubleClickEvent = lambda ev, w=w: self.naar_live()
 
+        # de meetcursors A en B (Meetbank): versleepbaar, op beide grafieken gekoppeld
+        self.cursors_aan = False
+        self._ab: dict[str, list] = {"A": [], "B": []}
+        for naam in ("A", "B"):
+            for w in (self.boven, self.onder):
+                lijn = pg.InfiniteLine(angle=90, movable=True, pen=pg.mkPen(thema.accent, width=2),
+                                       label=naam if w is self.boven else None,
+                                       labelOpts={"position": 0.97, "color": "#FFFFFF", "fill": thema.accent})
+                lijn.hide()
+                w.addItem(lijn, ignoreBounds=True)
+                lijn.sigDragged.connect(lambda l, naam=naam: self._ab_gesleept(naam, l))
+                self._ab[naam].append(lijn)
+
+    # ---- meetcursors
+    cursors_veranderd = Signal(float, float)   # tijd A, tijd B
+
+    def zet_cursors(self, aan: bool) -> None:
+        self.cursors_aan = aan
+        if aan:
+            x0, x1 = self.boven.getViewBox().viewRange()[0]
+            l = self.geschiedenis.laatste
+            if l is not None and x0 < l.t <= x1 + 1:          # om de laatste metingen heen, niet in het lege deel
+                b = l.t - 1.0
+                a = max(x0, b - min(60.0, (x1 - x0) * 0.4))
+            else:
+                a, b = x0 + (x1 - x0) * 0.3, x0 + (x1 - x0) * 0.7
+            self.zet_ab(a, b)
+        for lijnen in self._ab.values():
+            for l in lijnen:
+                l.setVisible(aan)
+
+    def zet_ab(self, a: float, b: float) -> None:
+        for l in self._ab["A"]:
+            l.setPos(a)
+        for l in self._ab["B"]:
+            l.setPos(b)
+        self.cursors_veranderd.emit(a, b)
+
+    def _ab_gesleept(self, naam: str, lijn) -> None:
+        x = lijn.getXPos()
+        for l in self._ab[naam]:
+            if l is not lijn:
+                l.setPos(x)
+        self.cursors_veranderd.emit(self._ab["A"][0].getXPos(), self._ab["B"][0].getXPos())
+
+    def ab(self) -> tuple[float, float]:
+        a, b = self._ab["A"][0].getXPos(), self._ab["B"][0].getXPos()
+        return (a, b) if a <= b else (b, a)
+
     # ---- gegevens
     def zet_bereik(self, vmax: float, imax: float) -> None:
         self.boven.setYRange(0, vmax * 1.1, padding=0.02)
