@@ -11,10 +11,10 @@ import time
 import webbrowser
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QAction, QKeySequence, QShortcut
-from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton,
-                               QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtCore import QRect, Qt, QTimer
+from PySide6.QtGui import QAction, QGuiApplication, QKeySequence, QShortcut
+from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
+                               QPushButton, QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
 from .. import VERSIE
 from ..kern import grenzen, instellingen
@@ -37,6 +37,30 @@ from .uitgebreid import Uitgebreid
 
 INDELINGEN = [("eenvoudig", "Eenvoudig"), ("uitgebreid", "Uitgebreid"), ("meetbank", "Meetbank"),
               ("presentatie", "Presentatie")]
+
+
+class Rolinhoud(QWidget):
+    """Een laag zonder layout tussen het rolgebied en de stapel indelingen.
+
+    QScrollArea kijkt naar `widget()->layout()->hasHeightForWidth()`: de labels met regelafbreking in de indelingen
+    geven die eigenschap door, en dan maakt het rolgebied de inhoud zo hoog als de *wenselijke* hoogte (de grafiek
+    wil 960 px) in plaats van de minimale, met een rolbalk tot gevolg. Zonder layout valt het terug op de minimale
+    maat, en pas daaronder komen er rolbalken. Gemeten op 23-10-2026 (1440x852 werkruimte)."""
+
+    def __init__(self, kind: QWidget):
+        super().__init__()
+        self.kind = kind
+        kind.setParent(self)
+
+    def minimumSizeHint(self):  # noqa: N802
+        return self.kind.minimumSizeHint()
+
+    def sizeHint(self):  # noqa: N802
+        return self.kind.sizeHint()
+
+    def resizeEvent(self, ev) -> None:  # noqa: N802
+        self.kind.setGeometry(self.rect())
+        super().resizeEvent(ev)
 
 
 class Hoofdvenster(QMainWindow):
@@ -89,6 +113,9 @@ class Hoofdvenster(QMainWindow):
         kl.addSpacing(12)
         self.menu = self.menuBar()
         self.menu.setNativeMenuBar(False)
+        # Standaard is een menubalk MinimumExpanding: dan eist hij zijn volle wenselijke breedte (550 px) als minimum
+        # en wordt het venster breder dan het scherm. Preferred laat hem krimpen.
+        self.menu.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         kl.addWidget(self.menu)
         kl.addStretch(1)
         lp = QLabel("Project")
@@ -132,7 +159,13 @@ class Hoofdvenster(QMainWindow):
         self.indelingen = [self.eenvoudig, self.uitgebreid, self.meetbank, self.presentatie]
         self.mini: Mini | None = None
         self.vorige_indeling = "eenvoudig"
-        root.addWidget(self.stapel, 1)
+        # De indelingen in een rolgebied: op een klein scherm komen er rolbalken in plaats van dat er iets
+        # buiten beeld valt. Op een gewoon scherm zie je er niets van.
+        self.rol = QScrollArea()
+        self.rol.setWidgetResizable(True)
+        self.rol.setFrameShape(QFrame.NoFrame)
+        self.rol.setWidget(Rolinhoud(self.stapel))
+        root.addWidget(self.rol, 1)
         self.tikker = QTimer(self)                    # de grafiek en de vensterstatistiek, 4x per seconde
         self.tikker.timeout.connect(self._tik)
         self.tikker.start(250)
@@ -156,9 +189,33 @@ class Hoofdvenster(QMainWindow):
         self._menus()
         QShortcut(QKeySequence(Qt.Key_Escape), self, self.noodstop)
         QShortcut(QKeySequence(Qt.Key_Space), self, lambda: self._uitgang(not self.uitgang))
-        self.resize(1440, 900)
+        self._plaats_venster()
         self._toon_verbinding(False)
         self._kies_indeling(self.inst["indeling"].get(self.project.sleutel, "eenvoudig"))
+
+    def _plaats_venster(self) -> None:
+        """Passend op het scherm (de werkruimte zonder taakbalk), en zoals de vorige keer als dat nog past."""
+        scherm = QGuiApplication.primaryScreen()
+        werk = scherm.availableGeometry() if scherm is not None else QRect(0, 0, 1440, 852)
+        g = self.inst.get("venster", {}).get("hoofd") or {}
+        titelbalk = 40                                  # de Windows-titelbalk zit niet in geometry()
+        b = max(900, min(int(g.get("b", 1400)), werk.width() - 16))
+        h = max(560, min(int(g.get("h", 840)), werk.height() - titelbalk - 8))
+        self.resize(b, h)
+        x, y = g.get("x"), g.get("y")
+        if x is None or y is None or not werk.contains(QRect(int(x), int(y), b, h + titelbalk)):
+            x = werk.x() + (werk.width() - b) // 2
+            y = werk.y() + max(0, (werk.height() - h - titelbalk) // 2)
+        self.move(int(x), int(y))
+        if g.get("max"):
+            self.setWindowState(Qt.WindowMaximized)
+
+    def _onthoud_venster(self) -> None:
+        g = self.inst.setdefault("venster", {}).setdefault("hoofd", {})
+        if self.isMaximized() or self.isFullScreen():
+            g["max"] = self.isMaximized()
+            return
+        g.update({"x": self.pos().x(), "y": self.pos().y(), "b": self.width(), "h": self.height(), "max": False})
 
     def _menus(self) -> None:
         m = self.menu.addMenu("Bestand")
@@ -216,7 +273,9 @@ class Hoofdvenster(QMainWindow):
         self.k_verbinden.setText("Verbreken" if aan else "Verbinden")
 
     def _op_verbonden(self, idn: str) -> None:
-        self.l_apparaat.setText(idn or self.voeding.naam)
+        naam = (idn or self.voeding.naam).strip()
+        self.l_apparaat.setToolTip(naam)
+        self.l_apparaat.setText(naam if len(naam) <= 34 else naam[:33] + "…")   # de hele *IDN? past niet in de kop
         self._toon_verbinding(True)
         self.energie.op_nul(time.time())
 
@@ -487,5 +546,6 @@ class Hoofdvenster(QMainWindow):
         if self.werker is not None:
             self.werker.stop()
         self.log.stop()
+        self._onthoud_venster()
         instellingen.bewaar(self.inst)
         ev.accept()

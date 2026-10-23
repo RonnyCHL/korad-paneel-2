@@ -74,6 +74,7 @@ QLineEdit:focus {{ border-color: {t.accent}; }}
 QComboBox {{ background: {t.kaart}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 8px;
              padding: 7px 12px; }}
 QComboBox QAbstractItemView {{ background: {t.kaart}; color: {t.inkt}; selection-background-color: {t.accent}; }}
+QScrollArea, QScrollArea > QWidget > QWidget {{ background: transparent; border: 0; }}
 QMenuBar {{ background: transparent; }}
 QMenuBar::item {{ padding: 8px 12px; border-radius: 8px; }}
 QMenuBar::item:selected {{ background: {t.kaart}; }}

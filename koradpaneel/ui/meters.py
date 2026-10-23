@@ -32,7 +32,7 @@ class RingMeter(QWidget):
         self.waarde = 0.0
         self.merk: float | None = None          # ingestelde waarde
         self.ondertekst = ""
-        self.setMinimumSize(220, 230)
+        self.setMinimumSize(190, 200)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def zet(self, waarde: float, merk: float | None = None, ondertekst: str | None = None) -> None:

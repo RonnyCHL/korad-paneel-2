@@ -56,7 +56,7 @@ class Uitgebreid(QWidget):
         self.m_i = RingMeter(thema, "Stroom", "A", "stroom", 3, imax)
         self.m_w = RingMeter(thema, "Vermogen", "W", "vermogen", 2, round(vmax * imax * 1.05, 1))
         for n, m in enumerate((self.m_v, self.m_i, self.m_w)):
-            m.setMinimumSize(170, 180)
+            m.setMinimumSize(150, 160)
             k = QFrame()
             k.setObjectName("kaart")
             lay = QVBoxLayout(k)

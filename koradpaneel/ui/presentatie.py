@@ -46,7 +46,7 @@ class Presentatie(QWidget):
         self.m_i = RingMeter(thema, "", "ampère", "stroom", 3, imax)
         self.m_w = RingMeter(thema, "", "watt", "vermogen", 2, round(vmax * imax * 1.05, 1))
         for m in (self.m_v, self.m_i, self.m_w):
-            m.setMinimumSize(360, 360)
+            m.setMinimumSize(280, 280)
             rij.addWidget(m, 1)
         root.addLayout(rij, 1)
         voet = QHBoxLayout()
