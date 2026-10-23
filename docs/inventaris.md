@@ -102,10 +102,10 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 ## Overig
 
 - [x] Instellingen in `korad_instellingen.json` (project, monitor, ntfy, geluid, web, spraak, rooktest, poorten).
-- [ ] Proef van het hele paneel met een nagebootste voeding en monitor (`tests/proef_paneel.py`, met
+- [x] Proef van het hele paneel met een nagebootste voeding en monitor (`tests/proef_paneel.py`, met
       belastingsmodellen: gewone belasting, print met LM2596, kortsluiting, lekstroom, diode, led, weerstand, TVS).
-- [ ] Handboek (PDF uit HTML, met voorbeeldschermen uit de nagebootste voeding).
-- [ ] Snelkoppeling/icoon; starten zonder console.
+- [x] Handboek (PDF uit HTML, met voorbeeldschermen uit de nagebootste voeding).
+- [x] Snelkoppeling/icoon; starten zonder console.
 
 ## Nieuw in paneel 2 (afgesproken 22-10-2026)
 
@@ -118,4 +118,4 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 - [ ] Accu nabootsen 2.0 (ontlaadkrommen lood/LiFePO₄/Li-ion, inwendige-weerstandsproef).
 - [ ] Logboek in SQLite, met CSV-export.
 - [ ] Bewaker die de uitgang uitzet als het programma zelf vastloopt.
-- [ ] Eén .exe met icoon.
+- [x] Eén .exe met icoon.

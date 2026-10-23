@@ -345,7 +345,9 @@ BOUWSTAPPEN = [
      "checks": ["De ESP32 start en meldt zich op het netwerk.",
                 "De monitor gekoppeld (venster CaraVan Guard): de modules hieronder gevonden."]},
 ]
-BOUW_BESTAND = Path(__file__).resolve().parents[2] / "korad_bouwstappen.json"
+from ..paden import BASIS
+
+BOUW_BESTAND = BASIS / "korad_bouwstappen.json"
 
 
 def build_verdict(stap: dict, res: dict) -> tuple[str, str]:

@@ -8,7 +8,7 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-MAP = Path(__file__).resolve().parents[2]
+from ..paden import BASIS as MAP
 BESTAND = MAP / "korad_werkboek.json"
 MAX = 2000
 

@@ -55,13 +55,20 @@ Gebouwd en vastgelegd (zie `git log`):
     buiten de grens van het project staat, en bij het verbinden leest de werker meteen de instellingen en zet het
     paneel een te hoge spanning/stroomgrens terug naar de grens.
 
+13. **Stap 5 (23-10 middag)**: vaste knoppen per project (EMSN-auto: Bordje 5 V/2 A, Bordje zacht 5 V/0,3 A,
+    USB-lader, 3,3 V; CaraVan Guard: Walstroom 13,8 V, Rijden 14,4 V, Accu vol 12,6 V, Accu leeg 11 V; Vrij: M1-M4
+    van de voeding; rechtsklik = bewaren met een naam), `koradpaneel/paden.py` (bestanden naast de .exe), de .exe
+    (`korad_paneel2.spec`, PyInstaller 6.22: dist/KoradPaneel2.exe, één bestand met icoon, 60 MB), het handboek
+    (`docs/handboek/handboek.html` + `maak_pdf.py` met Edge -> Korad-paneel-2-handboek.pdf, 15 hoofdstukken met
+    schermafdrukken uit de nagebootste voeding).
+
 Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/schermafdruk.py tbeam uit.png
 [eenvoudig|uitgebreid|meetbank|presentatie] [ms]`.
 
 ## Nog te doen (volgorde)
 
 - Stap 4 (rest): accu nabootsen 2.0 (ontlaadkrommen), accentkleur echt toepassen, logboek in SQLite.
-- Stap 5: één .exe met icoon; handboek; overstap.
+- Overstap: eerste echte proef aan de Korad met Ronny; daarna het oude paneel met rust laten.
 
 ## Eerste keer starten
 

@@ -22,7 +22,10 @@ from pathlib import Path
 
 from .geschiedenis import Meting
 
-MAP = Path(__file__).resolve().parents[2] / "testprogrammas"
+from ..paden import BASIS, BUNDEL
+
+MAP = BASIS / "testprogrammas"
+MAP_BUNDEL = BUNDEL / "testprogrammas"
 
 
 def duur_s(x) -> float:
@@ -137,9 +140,15 @@ def _getal_of_none(x):
 
 def lijst(map_: Path = MAP) -> list[Path]:
     try:
-        return sorted(p for p in map_.glob("*.json") if p.name != "laatste.json")
+        uit = sorted(p for p in map_.glob("*.json") if p.name != "laatste.json")
     except OSError:
-        return []
+        uit = []
+    if not uit and map_ == MAP and MAP_BUNDEL != MAP:          # als .exe: de meegebakken programma's
+        try:
+            uit = sorted(p for p in MAP_BUNDEL.glob("*.json") if p.name != "laatste.json")
+        except OSError:
+            pass
+    return uit
 
 
 # ---------------------------------------------------------------- de loop

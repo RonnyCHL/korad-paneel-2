@@ -44,6 +44,15 @@ PROJECTEN: dict[str, Project] = {
 }
 STANDAARD = "caravan"
 
+# Vaste knoppen per project: (naam, spanning, stroomgrens). Bij "vrij" zijn het de geheugens M1-M4 van de voeding.
+# Het bordje: 5,00 V zoals USB; "zacht" met 0,3 A voor een eerste proef of een verdacht bordje (gezond kaal bordje
+# 80-150 mA). De caravan: walstroom 13,8 V, rijden 14,4 V (dynamo), accu vol 12,6 V, accu leeg 11,0 V.
+VOORINSTELLINGEN: dict[str, list[tuple[str, float, float]] | None] = {
+    "emsn": [("Bordje", 5.0, 2.0), ("Bordje zacht", 5.0, 0.3), ("USB-lader", 5.0, 1.0), ("3,3 V", 3.3, 0.5)],
+    "caravan": [("Walstroom", 13.8, 1.5), ("Rijden", 14.4, 2.0), ("Accu vol", 12.6, 1.5), ("Accu leeg", 11.0, 1.5)],
+    "vrij": None,
+}
+
 
 def project(sleutel: str | None) -> Project:
     return PROJECTEN.get(sleutel or "", PROJECTEN[STANDAARD])

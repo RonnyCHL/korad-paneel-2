@@ -13,8 +13,8 @@ from datetime import datetime
 
 from PySide6.QtCore import QRect, Qt, QTimer
 from PySide6.QtGui import QAction, QGuiApplication, QKeySequence, QShortcut
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout, QLabel, QMainWindow, QMessageBox,
-                               QPushButton, QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow,
+                               QMessageBox, QPushButton, QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
 
 from .. import VERSIE
 from ..kern import grenzen, instellingen
@@ -243,6 +243,7 @@ class Hoofdvenster(QMainWindow):
         if eerste:
             self._plaats_venster()
         self._toon_verbinding(False)
+        self._toon_geheugens()
         self._kies_indeling(self.inst["indeling"].get(self.project.sleutel, "eenvoudig"))
 
     def _herbouw(self) -> None:
@@ -1037,7 +1038,44 @@ class Hoofdvenster(QMainWindow):
                 return
         self._stuur(self.voeding.zet_uitgang, aan)
 
+    # ---------------------------------------------------------------- vaste knoppen
+    def _voorinstellingen(self) -> list[tuple[str, float, float]] | None:
+        """De vier vaste knoppen van dit project, of None als het de geheugens M1-M4 van de voeding zijn (Vrij)."""
+        standaard = grenzen.VOORINSTELLINGEN.get(self.project.sleutel)
+        if standaard is None:
+            return None
+        eigen = (self.inst.get("voorinstellingen") or {}).get(self.project.sleutel)
+        uit = list(standaard)
+        for k, d in enumerate((eigen or [])[:4]):
+            try:
+                uit[k] = (str(d["naam"])[:18], float(d["v"]), float(d["i"]))
+            except (KeyError, TypeError, ValueError):
+                pass
+        return uit
+
+    def _toon_geheugens(self) -> None:
+        vi = self._voorinstellingen()
+        for n in range(1, 5):
+            if vi is None:
+                tekst = self.inst["geheugens"].get(str(n), f"M{n}")
+                tip = f"Geheugen M{n} van de voeding: klik = ophalen, rechtsklik = huidige instelling hier bewaren"
+            else:
+                naam, v, i = vi[n - 1]
+                tekst = f"{naam}\n{nl(v, 2).rstrip('0').rstrip(',')} V · {nl(i, 3).rstrip('0').rstrip(',')} A"
+                tip = f"{naam}: {nl(v, 2)} V, stroomgrens {nl(i, 3)} A. Rechtsklik = huidige instelling hier bewaren"
+            for w in (self.eenvoudig, self.uitgebreid):
+                w.k_geheugen[n - 1].setText(tekst)
+                w.k_geheugen[n - 1].setToolTip(tip)
+
     def _geheugen(self, n: int) -> None:
+        vi = self._voorinstellingen()
+        if vi is not None:                      # een vaste knop van het project: gewoon instellen, met alle vangnetten
+            naam, v, i = vi[n - 1]
+            if isinstance(self.proef, Accu):
+                self._stop_proef("Gestopt: vaste knop gebruikt")
+            self._stop_programma("Gestopt: vaste knop gebruikt")
+            self._zet(v, i)
+            return
         tekst = self.inst["geheugens"].get(str(n), "")
         try:                                   # de grens vooraf toetsen op wat we van deze plaats weten
             v_t, i_t = (float(x.split()[0].replace(",", ".")) for x in tekst.split("\n")[:2])
@@ -1060,6 +1098,18 @@ class Hoofdvenster(QMainWindow):
 
     def _geheugen_bewaren(self, n: int) -> None:
         if self.v_set is None:
+            return
+        vi = self._voorinstellingen()
+        if vi is not None:
+            naam, ok = QInputDialog.getText(self, f"Vaste knop {n}", f"Naam voor {nl(self.v_set, 2)} V / {nl(self.i_set, 3)} A:",
+                                            text=vi[n - 1][0])
+            if not ok:
+                return
+            eigen = self.inst.setdefault("voorinstellingen", {}).setdefault(self.project.sleutel,
+                                                                              [{"naam": a, "v": b, "i": c} for a, b, c in vi])
+            eigen[n - 1] = {"naam": (naam.strip() or vi[n - 1][0])[:18], "v": self.v_set, "i": self.i_set}
+            instellingen.bewaar(self.inst)
+            self._toon_geheugens()
             return
         if QMessageBox.question(self, f"Bewaren in M{n}", f"De huidige instelling ({nl(self.v_set, 2)} V, "
                                 f"{nl(self.i_set, 3)} A) bewaren in geheugen M{n} van de voeding?") != QMessageBox.Yes:
@@ -1135,6 +1185,7 @@ class Hoofdvenster(QMainWindow):
         instellingen.bewaar(self.inst)
         for w in self.indelingen:
             w.zet_grens(self.project.vmax, self.project.imax)
+        self._toon_geheugens()
         self._kies_indeling(self.inst["indeling"].get(self.project.sleutel, "eenvoudig"))
 
     def _kies_indeling(self, sleutel: str) -> None:

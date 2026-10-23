@@ -12,7 +12,9 @@ from pathlib import Path
 
 from .geschiedenis import Meting
 
-MAP = Path(__file__).resolve().parents[2] / "logs"
+from ..paden import BASIS
+
+MAP = BASIS / "logs"
 
 
 class CsvLog:

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>Korad paneel 2 - handboek</title>
+<style>
+  :root { --ink: #1D2228; --muted: #5C6470; --line: #D8DDE3; --soft: #F3F5F8; --blue: #3D7BF2; --red: #D9443B;
+          --amber: #B97C0B; --green: #1E9E55; --dark: #0F1115; }
+  @page { size: A4; margin: 15mm 17mm 17mm 17mm;
+          @bottom-center { content: "Korad paneel 2  \00B7  handboek  \00B7  " counter(page);
+                           font: 8.5pt "Segoe UI", sans-serif; color: #7A828E; } }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; color: var(--ink); background: #fff; font: 10.2pt/1.5 "Segoe UI", Arial, sans-serif; }
+  h2 { font-size: 19pt; font-weight: 600; margin: 0 0 4mm; padding-top: 1mm; }
+  h2 .n { color: var(--blue); margin-right: 3mm; }
+  h3 { font-size: 12.5pt; font-weight: 600; margin: 6mm 0 1.5mm; break-after: avoid; }
+  p { margin: 0 0 2.6mm; max-width: 165mm; }
+  section { break-before: page; }
+  section.vervolg { break-before: auto; margin-top: 9mm; }
+  figure { margin: 3mm 0 5mm; break-inside: avoid; }
+  figure img { width: 100%; display: block; border-radius: 2mm; border: 0.3mm solid #C9CFD7; }
+  figure.smal img { width: 62%; }
+  figcaption { font-size: 8.8pt; color: var(--muted); margin-top: 1.5mm; }
+  ol, ul { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin: 0 0 1.2mm; }
+  b { font-weight: 600; }
+  .knop { display: inline-block; font: 600 8.8pt "Segoe UI", sans-serif; padding: 0.2mm 2mm; border-radius: 1mm;
+          background: #21262E; color: #E8EBF0; white-space: nowrap; }
+  .knop.blauw { background: var(--blue); color: #fff; }
+  .knop.rood { background: var(--red); color: #fff; }
+  .toets { display: inline-block; font: 600 8.5pt Consolas, monospace; padding: 0 1.6mm; border: 0.3mm solid #B9C0CA;
+           border-bottom-width: 0.6mm; border-radius: 1mm; background: #fff; white-space: nowrap; }
+  .kader { background: var(--soft); border-radius: 2mm; padding: 3mm 4mm; margin: 3mm 0 4mm; break-inside: avoid; }
+  .kader p:last-child, .kader ul:last-child { margin-bottom: 0; }
+  .kader .kop { font: 600 9.5pt "Segoe UI", sans-serif; text-transform: uppercase; letter-spacing: 0.04em;
+                color: var(--blue); margin-bottom: 1mm; }
+  .kader.let-op { background: #FDF3E3; } .kader.let-op .kop { color: #9A5F00; }
+  .kader.gevaar { background: #FBE7E5; } .kader.gevaar .kop { color: #9E2A22; }
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 4mm; font-size: 9.6pt; break-inside: avoid; }
+  th { text-align: left; font: 600 8.6pt "Segoe UI", sans-serif; color: var(--muted); padding: 1.5mm 2mm;
+       border-bottom: 0.4mm solid var(--line); }
+  td { padding: 1.6mm 2mm; border-bottom: 0.25mm solid var(--line); vertical-align: top; }
+  td.nw { white-space: nowrap; }
+  .cover { height: 297mm; display: flex; flex-direction: column; background: var(--dark); color: #F2F3F5;
+           padding: 30mm 24mm; }
+  .cover .kicker { font-size: 11pt; letter-spacing: 0.2em; text-transform: uppercase; color: #9AA3B2; }
+  .cover h1 { font-size: 40pt; font-weight: 700; margin: 6mm 0 2mm; line-height: 1.1; }
+  .cover .sub { font-size: 15pt; color: #9AA3B2; max-width: 130mm; }
+  .cover .balk { margin-top: auto; display: flex; gap: 4mm; }
+  .cover .balk span { flex: 1; height: 3mm; border-radius: 2mm; }
+  .cover .meta { margin-top: 8mm; font-size: 10pt; color: #9AA3B2; }
+  .inhoud ol { list-style: none; padding: 0; columns: 2; column-gap: 10mm; }
+  .inhoud li { margin-bottom: 1.6mm; break-inside: avoid; }
+  .inhoud li b { color: var(--blue); margin-right: 2mm; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Handboek</div>
+  <h1>Korad paneel 2</h1>
+  <div class="sub">De labvoeding Korad KA3005PS als meetbank voor EMSN-auto en CaraVan Guard: meters, grafieken,
+    proeven, rapporten en een werkboek. Geschreven voor Ronny.</div>
+  <div class="balk"><span style="background:#FF6B6B"></span><span style="background:#F5B544"></span>
+    <span style="background:#3DDC97"></span><span style="background:#3D7BF2"></span></div>
+  <div class="meta">Versie 0.1 · 23 oktober 2026 · github.com/RonnyCHL/korad-paneel-2</div>
+</div>
+
+<section class="inhoud">
+  <h2>Inhoud</h2>
+  <ol>
+    <li><b>1</b> Snel aan de slag</li>
+    <li><b>2</b> Veiligheid: projecten en grenzen</li>
+    <li><b>3</b> De vier indelingen en het Mini-venster</li>
+    <li><b>4</b> Instellen, uitgang en de vaste knoppen</li>
+    <li><b>5</b> Grafiek, markeringen, log en rapport</li>
+    <li><b>6</b> Bewaking</li>
+    <li><b>7</b> Testprogramma's</li>
+    <li><b>8</b> EMSN-auto: het bordje aan de voeding</li>
+    <li><b>9</b> CaraVan Guard: monitor en proeven</li>
+    <li><b>10</b> Onderdelentester en accu nabootsen</li>
+    <li><b>11</b> Werkboek, logs openen en vergelijken</li>
+    <li><b>12</b> Meldingen, telefoon en instellingen</li>
+    <li><b>13</b> Toetsen en zoeken</li>
+    <li><b>14</b> Als het niet werkt</li>
+    <li><b>15</b> Bestanden en de .exe</li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="n">1</span>Snel aan de slag</h2>
+  <p>Het paneel praat via USB met de Korad (COM10) en laat spanning, stroom en vermogen zien op drie ringmeters.
+    Alles wat de voeding gevaarlijk zou kunnen maken voor wat eraan hangt, loopt door de <b>grens van het project</b>
+    (hoofdstuk 2).</p>
+  <ol>
+    <li>Zet de Korad aan en sluit de USB-kabel aan.</li>
+    <li>Start <b>KoradPaneel2.exe</b> (of <span class="knop">.venv\Scripts\python korad_paneel2.py</span>). Het paneel
+      zoekt de poort zelf en verbindt.</li>
+    <li>Kies rechtsboven het <b>project</b>: EMSN-auto (hooguit 5,5 V, 2 A), CaraVan Guard (15 V, 4 A) of Vrij.</li>
+    <li>Vul spanning en stroomgrens in, klik <span class="knop blauw">Instellen</span>, dan
+      <span class="knop blauw">Uitgang aanzetten</span>. Of klik een vaste knop (hoofdstuk 4).</li>
+    <li><span class="toets">Esc</span> is altijd de noodstop: uitgang uit, elke proef gestopt.</li>
+  </ol>
+  <figure><img src="img/eenvoudig.png" alt="De indeling Eenvoudig"><figcaption>Indeling Eenvoudig, project EMSN-auto:
+    drie meters, de lampjes, instellen, uitgang en de vaste knoppen.</figcaption></figure>
+  <div class="kader"><div class="kop">Oefenen zonder voeding</div>
+    <p>Start met <span class="knop">--nagebootst tbeam</span> (of <span class="knop">print</span>, <span class="knop">accu</span>,
+      <span class="knop">kort</span>): dan doet het paneel een voeding met die belasting na, inclusief het bordje
+      en de CaraVan-monitor. Alles werkt, er gebeurt niets echts.</p></div>
+</section>
+
+<section>
+  <h2><span class="n">2</span>Veiligheid: projecten en grenzen</h2>
+  <p>Een project is een kaartje met een naam, een maximale spanning en stroomgrens, en de reden daarvoor. Het paneel
+    weigert alles daarboven: instellen, de vaste knoppen, programma's, accu nabootsen. Het grijpt ook in als de voeding
+    aan de voorkant hoger wordt gezet terwijl de uitgang aan staat.</p>
+  <table>
+    <tr><th>Project</th><th>Grens</th><th>Waarom</th></tr>
+    <tr><td class="nw">EMSN-auto</td><td class="nw">5,5 V · 2 A</td><td>de VBUS-ingang van de AXP2101 op de T-Beam verdraagt hooguit 5,5 V</td></tr>
+    <tr><td class="nw">CaraVan Guard</td><td class="nw">15 V · 4 A</td><td>de TVS-diode D2 op de print gaat rond 17 V geleiden</td></tr>
+    <tr><td class="nw">Vrij</td><td class="nw">30 V · 5 A</td><td>het bereik van de voeding</td></tr>
+  </table>
+  <div class="kader gevaar"><div class="kop">De voeding onthoudt zijn laatste instelling</div>
+    <p>De Korad start op met de spanning van de vorige keer. Daarom doet het paneel sinds 23 oktober twee dingen
+      extra: bij het verbinden leest het meteen de instelling en zet het een te hoge spanning of stroomgrens terug naar
+      de grens van het project, en <b>uitgang aan wordt geweigerd</b> zolang de instelling buiten de grens valt.
+      Zo kan 13,8 V van de caravan nooit meer op het bordje komen.</p></div>
+  <ul>
+    <li>Bij instellen gaat <b>eerst de stroomgrens</b> naar de voeding, dan de spanning.</li>
+    <li>Spanning verhogen terwijl de uitgang aan staat vraagt om bevestiging.</li>
+    <li>Bij het sluiten met de uitgang aan vraagt het paneel of hij uit mag.</li>
+    <li>Voor de TVS-diode in de onderdelentester mag de spanning tot 25 V, maar met 1 mA: alleen het losse onderdeel.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="n">3</span>De vier indelingen en het Mini-venster</h2>
+  <p>Menu <b>Beeld</b> of de functietoetsen. De keuze wordt per project onthouden.</p>
+  <table>
+    <tr><th>Toets</th><th>Indeling</th><th>Waarvoor</th></tr>
+    <tr><td class="nw"><span class="toets">F1</span></td><td>Eenvoudig</td><td>grote meters, lampjes, instellen, vaste knoppen</td></tr>
+    <tr><td class="nw"><span class="toets">F2</span></td><td>Uitgebreid</td><td>kleine meters, status, verbruik, de grafiek, bediening, lopende proef, bewaking en notitie</td></tr>
+    <tr><td class="nw"><span class="toets">F3</span></td><td>Meetbank</td><td>de grafiek groot met de meetcursors A en B en de getallen van het stuk ertussen</td></tr>
+    <tr><td class="nw"><span class="toets">F4</span></td><td>Presentatie</td><td>volledig scherm, alleen de meters; <span class="toets">Esc</span> = noodstop én terug</td></tr>
+    <tr><td class="nw"><span class="toets">F5</span></td><td>Mini-venster</td><td>klein venster altijd bovenop, met verloopgrafiekje en uit-knop</td></tr>
+  </table>
+  <figure><img src="img/uitgebreid.png" alt="De indeling Uitgebreid"><figcaption>Uitgebreid: bovenin de meters, status
+    en verbruik, in het midden spanning en stroom onder elkaar, onderin bediening, lopende proef en bewaking.</figcaption></figure>
+  <figure><img src="img/meetbank.png" alt="De indeling Meetbank"><figcaption>Meetbank: cursors A en B versleep je in de
+    grafiek; rechts hoogste, gemiddelde en laagste stroom, lading en energie tussen A en B. Exporteer de selectie als CSV
+    of maak er een rapport van.</figcaption></figure>
+  <p>Grafiek: slepen = zoomen, dubbelklik = terug naar live. De knoppen 1 min, 5 min en 30 min zetten de breedte.
+    Beweeg de muis over de grafiek voor de meetcursor met tijd, spanning en stroom.</p>
+</section>
+
+<section>
+  <h2><span class="n">4</span>Instellen, uitgang en de vaste knoppen</h2>
+  <p>Spanning en stroomgrens vul je in met een komma (5,00 en 2,000) en <span class="toets">Enter</span> of
+    <span class="knop blauw">Instellen</span>. De velden volgen de voeding: draai je aan de knop op de Korad, dan zie
+    je dat hier terug.</p>
+  <h3>Vaste knoppen per project</h3>
+  <p>De vier knoppen rechts van Uitgang zijn per project anders. Een klik stelt spanning en stroomgrens in (door alle
+    vangnetten van hoofdstuk 2); de uitgang verandert niet.</p>
+  <table>
+    <tr><th>EMSN-auto</th><th>CaraVan Guard</th><th>Vrij</th></tr>
+    <tr><td>Bordje 5 V · 2 A<br>Bordje zacht 5 V · 0,3 A<br>USB-lader 5 V · 1 A<br>3,3 V · 0,5 A</td>
+        <td>Walstroom 13,8 V · 1,5 A<br>Rijden 14,4 V · 2 A<br>Accu vol 12,6 V · 1,5 A<br>Accu leeg 11 V · 1,5 A</td>
+        <td>M1 tot M4: de geheugens van de voeding zelf (RCL). Na een klik leest het paneel wat erin zit en zet dat op de knop.</td></tr>
+  </table>
+  <p><b>Rechtsklik</b> op een knop bewaart de huidige instelling op die plek: bij een project met een naam naar keuze,
+    bij Vrij in het geheugen van de voeding (SAV). "Bordje zacht" is bedoeld voor een eerste keer of een verdacht
+    bordje: een gezond kaal bordje trekt 80 tot 150 mA; 0 mA of 300 mA in begrenzing betekent dat er iets stuk is.</p>
+  <h3>Uitgang</h3>
+  <p><span class="toets">Spatie</span> schakelt de uitgang. Aanzetten kan alleen als de instelling binnen de grens valt.
+    De lampjes zeggen in woorden wat er gebeurt: CV = vaste spanning, CC = de voeding begrenst de stroom (en piept
+    als dat langer dan een halve seconde duurt).</p>
+</section>
+
+<section>
+  <h2><span class="n">5</span>Grafiek, markeringen, log en rapport</h2>
+  <p>Alles wat de voeding meet (vijf keer per seconde) komt in één geschiedenis; de grafiek, de meetcursors, de
+    rapporten en het verbruik lezen daar allemaal uit.</p>
+  <ul>
+    <li><b>Markering</b>: typ een notitie in Uitgebreid en klik Plaatsen (of <span class="toets">Enter</span>). Proeven
+      plaatsen zelf markeringen (start, stappen, klaar). Ze staan in de grafiek, het CSV-log en het rapport.</li>
+    <li><b>Log</b>: <span class="toets">Ctrl+L</span> of de knop Log starten. Elke meting een regel in
+      <span class="knop">logs\log_datum_tijd.csv</span>; markeringen als aparte regel. Excel leest het, en het paneel
+      zelf ook (hoofdstuk 11).</li>
+    <li><b>Rapport</b>: de knop Rapport maakt een HTML-pagina van wat in beeld staat (of tussen A en B): getallen,
+      grafiek, markeringen. In de map <span class="knop">rapporten</span>, en als regel in het werkboek.</li>
+    <li><b>Verbruik</b>: mAh en Wh sinds het verbinden of sinds Op nul; "in beeld" geeft hoogste, gemiddelde en
+      laagste stroom van het stuk grafiek dat je ziet.</li>
+  </ul>
+</section>
+
+<section class="vervolg">
+  <h2><span class="n">6</span>Bewaking</h2>
+  <p>Drie regels (knop Bewaking instellen in Uitgebreid): stroom, spanning of vermogen, boven of onder een waarde,
+    gedurende een aantal seconden, en dan <b>uitgang uit</b> of <b>waarschuwen</b>. Een regel gaat af als de
+    voorwaarde de hele duur ononderbroken waar is, en daarna pas opnieuw nadat hij een keer niet meer waar was. Bij
+    alarm: piep, melding op het scherm, en als dat aan staat spraak en ntfy. Het bestand is hetzelfde als van het oude
+    paneel (<span class="knop">korad_bewaking.json</span>).</p>
+</section>
+
+<section>
+  <h2><span class="n">7</span>Testprogramma's</h2>
+  <p><span class="toets">Ctrl+P</span> opent de lijst. Een programma is een rij stappen: sprong of helling naar een
+    spanning, met een stroomgrens, uitgang aan of uit, en een duur (ook als "1:30" of "45 s"). Herhalen kan, en
+    "uitgang uit na afloop". Per stap kan een <b>verwachting</b> staan: de gemiddelde stroom tussen grenzen vanaf
+    zoveel seconden in de stap, en/of een melding die de monitor moet geven (bijvoorbeeld "12 V weg").</p>
+  <p>Het venster toont de omschrijving en een voorbeeldgrafiek van het verloop. Tijdens het lopen staat de voortgang
+    in de kaart <b>Lopende proef</b> (Uitgebreid), met een markering per stap. Na afloop: rapport met de uitslag
+    (hoeveel verwachtingen goed), regel in het werkboek, melding.</p>
+  <p>De negen programma's van het oude paneel staan in <span class="knop">testprogrammas</span> en laden ongewijzigd:
+    CaraVan Guard (auto starten, lader drietraps, rijden, walstroom weg, wiebelende stekker, zakkende spanning) en
+    EMSN-auto (auto aan-uit 20x, laadt het 30 min, wiebelende stekker).</p>
+</section>
+
+<section>
+  <h2><span class="n">8</span>EMSN-auto: het bordje aan de voeding</h2>
+  <p>Het T-Beam-bordje van de Golf GTE krijgt in de auto 5 V van de USB-lader. Aan de Korad doe je dat na:</p>
+  <table>
+    <tr><th>Korad</th><th>Naar</th><th>Let op</th></tr>
+    <tr><td class="nw">+ (rood)</td><td>T-Beam pin "5V"</td><td>die pin is de VBUS van de AXP2101 en de USB-chip: hooguit 5,5 V</td></tr>
+    <tr><td class="nw">- (zwart)</td><td>T-Beam GND</td><td></td></tr>
+    <tr><td class="nw">laptop</td><td>micro-USB</td><td>met de rode draad doorgeknipt, anders staan laptop en Korad samen op de 5 V; de seriële log (COM6) werkt gewoon</td></tr>
+  </table>
+  <h3>Startproef: bordje N keer aan en uit (<span class="toets">Ctrl+B</span>)</h3>
+  <p>Per start gaat de uitgang een paar seconden uit en dan weer aan op 5,00 V (grens 2 A). Het paneel leest in de
+    seriële log van het bordje de <b>i2c-keuring</b>: "goed" als de laadchip, de bewegingssensor en de luchtsensor
+    antwoorden, "dood" als de laadchip (0x34) zwijgt, "half" als één sensor ontbreekt, en "herstartlus" als alleen de
+    ROM-bootloader steeds opnieuw start (de 3,3 V valt weg). Daarbij de stroom na 3, 10 en 30 s, en hoe lang Windows
+    deed over het terugvinden van de poort.</p>
+  <figure><img src="img/startproef-venster.png" alt="Het venster van de startproef"><figcaption>De startproef met het
+    nagebootste bordje: per start boot, poort, stroom en de keuring. Na afloop een rapport en een regel in het werkboek.</figcaption></figure>
+  <div class="kader let-op"><div class="kop">De poort komt en gaat met de stroom</div>
+    <p>De USB-chip van het bordje wordt uit dezelfde 5 V gevoed. Bij "auto uit" verdwijnt COM6 uit Windows; de proef
+      sluit de poort daarom vóór elke uit en zoekt hem na "aan" geduldig terug. Geen ander programma mag COM6 open
+      hebben.</p></div>
+</section>
+
+<section>
+  <h2><span class="n">9</span>CaraVan Guard: monitor en proeven</h2>
+  <p><span class="toets">Ctrl+G</span> opent het venster met zes tabbladen. De <b>monitor</b> (de ESP32 op de
+    draagprint) wordt via wifi gekoppeld op zijn adres of caravan.local; het paneel leest elke seconde zijn 12 V,
+    stroom, UPS-cel, strips, firmware en modules, en elke twee seconden zijn logboek. Proeven lezen daaruit en kunnen
+    de strips sturen.</p>
+  <figure><img src="img/caravan-caravanvenster.png" alt="Het venster CaraVan Guard, tabblad Rooktest"><figcaption>Het
+    tabblad Rooktest na een proef tegen de nagebootste monitor.</figcaption></figure>
+  <table>
+    <tr><th>Tabblad</th><th>Wat het doet</th></tr>
+    <tr><td class="nw">Opstartcurve</td><td>zachte start: uitgang uit, op 0 V aan, in stapjes omhoog terwijl de stroom wordt gemeten; bij de stroomgrens meteen uit. Grafiek stroom tegen spanning, uitleg in gewone taal, CSV.</td></tr>
+    <tr><td class="nw">Bouwstappen</td><td>de zeven stappen van de draagprint (hoofdstuk 3 van de bouwhandleiding): per stap de zachte start met een verwachte stroom, oordeel goed / let op / zoeken, vinkjes voor de multimeter, notitie, uitvaltest (5 s zonder 12 V), gevonden I2C-modules, bouwrapport. Stand in <span class="knop">korad_bouwstappen.json</span>.</td></tr>
+    <tr><td class="nw">Controles</td><td>spanningsmeting controleren (10,5 tot 14,8 V in elf stappen), stroommeting ijken (strips 0 tot 100 %, geeft de nieuwe INA219_SHUNT_CAL), UPS-duurtest (uitgang uit tot de monitor 30 s zwijgt).</td></tr>
+    <tr><td class="nw">Rooktest</td><td>na een update: monitor, firmware, modules, SD, 12 V- en stroommeting, strips, uitval van de 12 V, geen herstart. Basis bewaren onthoudt het normale verbruik voor de volgende keer.</td></tr>
+    <tr><td class="nw">Nachttest</td><td>uren meten met een eigen log, bijzonderheden (stroompiek, CC, monitor stil, herstart) als markering en melding, rapport aan het eind.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">10</span>Onderdelentester en accu nabootsen</h2>
+  <h3>Onderdelentester (menu Gereedschap)</h3>
+  <p>De voeding als meetinstrument voor een los onderdeel: diode of led (5 V, 10 mA), weerstand (1 V, 100 mA) of de
+    TVS-diode (eerst 14 V met 5 mA, dan tot 25 V met 1 mA). De uitgang gaat een paar seconden aan tot de meting
+    stilstaat, dan uit; je instellingen komen terug. De uitslag staat in gewone taal: doorlaatspanning en richting,
+    de weerstandswaarde met nauwkeurigheid, of de doorslagspanning.</p>
+  <figure><img src="img/caravan-onderdelenvenster.png" alt="De onderdelentester"><figcaption>De onderdelentester na een
+    weerstandsmeting (nagebootst: er hing niets aan).</figcaption></figure>
+  <h3>Accu nabootsen (menu Gereedschap)</h3>
+  <p>De spanning loopt lineair van de beginspanning naar de eindspanning in zoveel minuten, en zakt daarbij mee met
+    de stroom door een inwendige weerstand R: bron min stroom maal R, zoals een echte accu onder belasting. Handig om
+    te zien wanneer de monitor "accu leeg" meldt. De voortgang staat in de kaart Lopende proef.</p>
+</section>
+
+<section>
+  <h2><span class="n">11</span>Werkboek, logs openen en vergelijken</h2>
+  <p>Het <b>werkboek</b> (<span class="toets">Ctrl+W</span>) is alles wat gemeten is, op datum: rapporten, logs,
+    programma's, startproeven, bouwstappen, notities. Zoeken, openen (een CSV in de grafiek, een HTML in de browser),
+    map openen, notitie toevoegen, mappen doorzoeken, en het werkboek van het oude paneel inlezen.</p>
+  <figure><img src="img/vensters-werkboekvenster.png" alt="Het werkboek"><figcaption>Het werkboek met een staafje per dag.</figcaption></figure>
+  <p><b>Log openen</b> (<span class="toets">Ctrl+O</span>) zet een oud log in de grafiek met zijn markeringen en de
+    getallen; ook de logs van het oude paneel. <b>Logs vergelijken</b> legt twee logs over elkaar, allebei vanaf hun
+    eigen begin, als stroom, spanning of vermogen, met een tabel van de verschillen en een rapport.</p>
+  <figure><img src="img/vensters-vergelijkvenster.png" alt="Logs vergelijken"><figcaption>Logs vergelijken: meting A en
+    B, verschil B min A.</figcaption></figure>
+</section>
+
+<section>
+  <h2><span class="n">12</span>Meldingen, telefoon en instellingen</h2>
+  <p><span class="toets">Ctrl+,</span> opent de instellingen.</p>
+  <ul>
+    <li><b>Thema</b> donker of licht, wisselt meteen. Accentkleur.</li>
+    <li><b>Geluid</b>: piep bij CC langer dan een halve seconde; <b>spraak</b>: de Nederlandse stem van Windows
+      spreekt alarm, noodstop en uitslagen uit (Test spraak laat horen of er een stem is).</li>
+    <li><b>ntfy</b>: server en onderwerp; dan komen alarm, proef klaar en noodstop op je telefoon. Testmelding.</li>
+    <li><b>Telefoon als afstandsbediening</b>: zet aan, scan de QR-code (zelfde wifi). Op de telefoon zie je spanning,
+      stroom, de grafiek van de laatste vijf minuten, een alarm en de lopende proef; je kunt een markering plaatsen en
+      de uitgang <b>uit</b> zetten. Aanzetten kan alleen aan de laptop. De code in de link is het wachtwoord.</li>
+    <li><b>Apparaten</b>: de poort van de Korad (leeg = zelf zoeken), van het bordje (COM6) en het adres van de monitor.</li>
+  </ul>
+  <figure class="smal"><img src="img/stap4-instellingendialoog.png" alt="Het instellingenvenster"><figcaption>Instellingen
+    met de telefoon aan: link en QR-code.</figcaption></figure>
+</section>
+
+<section>
+  <h2><span class="n">13</span>Toetsen en zoeken</h2>
+  <table>
+    <tr><th>Toets</th><th>Doet</th></tr>
+    <tr><td class="nw"><span class="toets">Esc</span></td><td>noodstop: uitgang uit, proef en programma gestopt (ook in Presentatie: terug naar het paneel)</td></tr>
+    <tr><td class="nw"><span class="toets">Spatie</span></td><td>uitgang aan of uit</td></tr>
+    <tr><td class="nw"><span class="toets">Ctrl+K</span></td><td>zoeken: typ een paar letters van een menu-opdracht, Enter voert uit</td></tr>
+    <tr><td class="nw"><span class="toets">F1</span> tot <span class="toets">F5</span></td><td>indelingen en Mini-venster</td></tr>
+    <tr><td class="nw"><span class="toets">Ctrl+P</span> <span class="toets">Ctrl+B</span> <span class="toets">Ctrl+G</span></td><td>testprogramma's, bordje starten, CaraVan Guard</td></tr>
+    <tr><td class="nw"><span class="toets">Ctrl+W</span> <span class="toets">Ctrl+O</span> <span class="toets">Ctrl+L</span></td><td>werkboek, log openen, log starten/stoppen</td></tr>
+    <tr><td class="nw"><span class="toets">Ctrl+,</span></td><td>instellingen</td></tr>
+  </table>
+</section>
+
+<section class="vervolg">
+  <h2><span class="n">14</span>Als het niet werkt</h2>
+  <table>
+    <tr><th>Wat je ziet</th><th>Wat er is</th></tr>
+    <tr><td>"niet verbonden" of "verbinden mislukt"</td><td>de Korad staat uit, de USB-kabel zit los, of een ander programma heeft COM10 open (het oude paneel, een seriële monitor). De poort kan maar door één programma open zijn.</td></tr>
+    <tr><td>"Uitgang blijft uit: buiten de grens"</td><td>de voeding staat hoger dan het project toelaat. Stel eerst iets binnen de grens in, of kies het juiste project.</td></tr>
+    <tr><td>"Boven de grens ... de uitgang is uitgezet"</td><td>iemand draaide de knop op de Korad omhoog terwijl de uitgang aan stond; het paneel greep in.</td></tr>
+    <tr><td>Startproef: "geen seriële poort"</td><td>COM6 komt niet terug: zit de laptopkabel in het bordje, heeft een ander programma de poort, krijgt het bordje wel 5 V?</td></tr>
+    <tr><td>Startproef: alles "herstartlus"</td><td>de 3,3 V op het bordje valt steeds weg: stroomgrens te laag (CC-lampje), kortsluiting via een sensor, of de AXP2101 is stuk.</td></tr>
+    <tr><td>Monitor: "geen antwoord"</td><td>verkeerd adres, andere wifi, of de monitor draait niet. Na het flashen kan het een minuut duren.</td></tr>
+    <tr><td>Geen stem bij Test spraak</td><td>Windows: Instellingen > Tijd en taal > Spraak > Stemmen beheren > Nederlands toevoegen.</td></tr>
+    <tr><td>Telefoon: geen verbinding</td><td>zelfde wifi? De eerste keer vraagt Windows of Python verbindingen mag ontvangen: Privénetwerken, Toestaan.</td></tr>
+  </table>
+</section>
+
+<section class="vervolg">
+  <h2><span class="n">15</span>Bestanden en de .exe</h2>
+  <p>Alles staat naast het programma (de map van de .exe, of de map van de repository):</p>
+  <table>
+    <tr><th>Bestand of map</th><th>Inhoud</th></tr>
+    <tr><td class="nw">korad_instellingen.json</td><td>instellingen, vaste knoppen, venstermaat, telefooncode; niet in git</td></tr>
+    <tr><td class="nw">korad_bewaking.json</td><td>de drie bewakingsregels</td></tr>
+    <tr><td class="nw">korad_werkboek.json</td><td>het werkboek</td></tr>
+    <tr><td class="nw">korad_bouwstappen.json</td><td>de stand van de bouwstappen</td></tr>
+    <tr><td class="nw">logs\</td><td>CSV-logs (puntkomma; tijd, unix, volt, ampere, watt, markering)</td></tr>
+    <tr><td class="nw">rapporten\</td><td>HTML-rapporten</td></tr>
+    <tr><td class="nw">testprogrammas\</td><td>de programma's (JSON); in de .exe meegebakken, een map ernaast gaat voor</td></tr>
+  </table>
+  <p>De .exe maken: <span class="knop">.venv\Scripts\pyinstaller korad_paneel2.spec</span> geeft
+    <span class="knop">dist\KoradPaneel2.exe</span>, één bestand met icoon, zonder console. Dit handboek:
+    <span class="knop">docs\handboek\maak_pdf.py</span> maakt de PDF met Edge. De toetsen:
+    <span class="knop">.venv\Scripts\python -m pytest</span>.</p>
+</section>
+
+</body>
+</html>

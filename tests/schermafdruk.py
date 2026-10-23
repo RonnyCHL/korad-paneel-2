@@ -47,7 +47,10 @@ if os.environ.get("KP_STARTPROEF"):
     import webbrowser
     webbrowser.open = lambda url: print("RAPPORT:", url)
     _Orig = sp_mod.Startproef
-    sp_mod.Startproef = lambda n, u, a, **kw: _Orig(n, u, a, momenten=(0.5, 1.0, 2.0), **kw)
+    class _Kort(_Orig):                      # korte momenten, maar wel een echte klasse (isinstance in het paneel)
+        def __init__(self, n, u, a, **kw):
+            super().__init__(n, u, a, momenten=(0.5, 1.0, 2.0), **kw)
+    sp_mod.Startproef = _Kort
     venster.maak_bordje = lambda _p: NagebootstBordje("wissel", poort_s=0.3, boot_s=0.6)
     venster.inst.setdefault("emsn", {})
     QTimer.singleShot(400, lambda: (venster._startproef_venster(), venster.sp_venster.setAttribute(Qt.WA_DontShowOnScreen, True)))

@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
 from koradpaneel.apparaat.bordje import Bordje, NagebootstBordje
@@ -31,6 +32,9 @@ def main(argv: list[str] | None = None) -> int:
     app = QApplication(sys.argv[:1])
     app.setApplicationName("Korad paneel 2")
     app.setStyle("Fusion")
+    from koradpaneel.paden import BUNDEL
+    if (BUNDEL / "korad.ico").exists():
+        app.setWindowIcon(QIcon(str(BUNDEL / "korad.ico")))
 
     if a.nagebootst:
         maak = lambda _poort: nagebootst.Nagebootst(a.nagebootst)

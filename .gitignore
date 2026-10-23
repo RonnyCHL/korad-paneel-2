@@ -10,3 +10,6 @@ schermafdruk*.png
 korad_werkboek.json
 rapporten/
 logs/
+build_log.txt
+*.spec.bak
+korad_bouwstappen.json

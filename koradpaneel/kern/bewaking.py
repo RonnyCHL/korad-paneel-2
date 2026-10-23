@@ -14,7 +14,7 @@ from pathlib import Path
 
 from .geschiedenis import Meting
 
-MAP = Path(__file__).resolve().parents[2]
+from ..paden import BASIS as MAP
 BESTAND = MAP / "korad_bewaking.json"
 EENHEID = {"stroom": "mA", "spanning": "V", "vermogen": "W"}
 ACTIES = ("uitgang uit", "waarschuwen")

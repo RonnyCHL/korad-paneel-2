@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-MAP = Path(__file__).resolve().parents[2]
+from ..paden import BASIS as MAP
 BESTAND = MAP / "korad_instellingen.json"
 
 STANDAARD: dict = {
@@ -19,6 +19,7 @@ STANDAARD: dict = {
     "accent": "#3D7BF2",
     "indeling": {"caravan": "eenvoudig", "emsn": "eenvoudig", "vrij": "eenvoudig"},
     "geheugens": {"1": "3,3 V\n0,5 A", "2": "5 V\n1 A", "3": "12 V\n0,5 A", "4": "13,8 V\n0,5 A"},
+    "voorinstellingen": {},          # per project: [{"naam", "v", "i"} x4], anders de standaard uit grenzen.py
     "geluid_cc": True,
     "spraak": False,
     "ntfy": {"server": "https://ntfy.sh", "onderwerp": "", "aan": False},

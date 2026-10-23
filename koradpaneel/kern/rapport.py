@@ -11,7 +11,9 @@ from pathlib import Path
 
 from .geschiedenis import Meting, venster_uit
 
-MAP = Path(__file__).resolve().parents[2] / "rapporten"
+from ..paden import BASIS
+
+MAP = BASIS / "rapporten"
 DAGEN = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag", "zondag"]
 MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober",
            "november", "december"]
