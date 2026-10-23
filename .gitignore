@@ -13,3 +13,7 @@ logs/
 build_log.txt
 *.spec.bak
 korad_bouwstappen.json
+dist_nieuw/
+zelftest_ok.txt
+KoradPaneel2.exe
+*.exe

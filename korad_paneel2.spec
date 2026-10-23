@@ -26,7 +26,7 @@ a = Analysis(
               "PySide6.QtSensors", "PySide6.QtSerialBus", "PySide6.QtTextToSpeech", "PySide6.QtWebChannel",
               "PySide6.QtWebSockets", "PySide6.QtBluetooth", "PySide6.QtNfc", "PySide6.QtDesigner",
               "PySide6.QtHelp", "PySide6.QtUiTools", "PySide6.QtXml", "PySide6.QtSql", "PySide6.QtTest",
-              "PySide6.QtOpenGL", "PySide6.QtOpenGLWidgets", "PySide6.QtSvgWidgets", "PySide6.QtNetworkAuth",
+              "PySide6.QtNetworkAuth",
               "PySide6.QtHttpServer", "PySide6.QtGraphs", "PySide6.QtQuick3D", "PySide6.QtScxml",
               "PySide6.QtStateMachine", "PySide6.QtSpatialAudio", "PySide6.QtQuickWidgets", "PySide6.QtWebView",
               "PySide6.QtAsyncio", "numpy.testing", "matplotlib", "scipy", "pandas", "IPython"],

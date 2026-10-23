@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 
 from PySide6.QtGui import QIcon
@@ -46,6 +47,22 @@ def main(argv: list[str] | None = None) -> int:
         maak_monitor = lambda adres: Monitor(adres)
     venster = Hoofdvenster(maak, maak_bordje=maak_bordje, maak_monitor=maak_monitor)
     venster.show()
+    zelftest = os.environ.get("KP_ZELFTEST")
+    if zelftest:                       # voor de bouwcontrole van de .exe: zoveel seconden draaien, dan een bewijsje schrijven
+        from PySide6.QtCore import QTimer
+        from koradpaneel import VERSIE
+        from koradpaneel.paden import BASIS
+
+        def klaar():
+            m = venster.laatste_meting
+            (BASIS / "zelftest_ok.txt").write_text(
+                f"Korad paneel {VERSIE}: venster '{venster.windowTitle()}', {len(venster.geschiedenis)} metingen, "
+                f"laatste {m.v if m else None} V\n", encoding="utf-8")
+            venster.werker.stop()
+            venster.werker = None
+            app.quit()
+
+        QTimer.singleShot(int(float(zelftest) * 1000), klaar)
     return app.exec()
 
 
