@@ -80,6 +80,11 @@ QTableWidget::item {{ padding: 4px 8px; border-bottom: 1px solid {t.kaart_rand};
 QHeaderView::section {{ background: {t.kaart}; color: {t.inkt_zacht}; border: 0; border-bottom: 1px solid {t.kaart_rand};
                         padding: 6px 8px; font-weight: 600; }}
 QDialog {{ background: {t.grond}; }}
+QListWidget {{ background: {t.kaart}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px; padding: 6px; }}
+QListWidget::item {{ padding: 8px; border-radius: 6px; }}
+QListWidget::item:selected {{ background: {t.accent}; color: #FFFFFF; }}
+QCheckBox::indicator {{ width: 18px; height: 18px; border: 1px solid {t.kaart_rand}; border-radius: 5px; background: {t.veld}; }}
+QCheckBox::indicator:checked {{ background: {t.accent}; border-color: {t.accent}; }}
 QProgressBar {{ border: 0; }}
 QComboBox {{ background: {t.kaart}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 8px;
              padding: 7px 12px; }}

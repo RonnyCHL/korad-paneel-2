@@ -23,6 +23,8 @@ from ..kern import rapport as rapport_mod
 from ..kern import programma as pr
 from ..kern import startproef as sp_mod
 from ..kern.accu import Accu
+from ..kern.meldingen import Meldingen
+from ..kern.telefoon import Telefoon
 from ..kern.bewaking import Bewaking
 from ..kern.werkboek import Werkboek
 from ..apparaat.bordje import Bordje
@@ -40,6 +42,8 @@ from .startproef import StartproefVenster
 from .accu_dialoog import AccuDialoog
 from .logvenster import LogVenster, VergelijkVenster, kies_log, laad_log
 from .werkboek_venster import WerkboekVenster
+from .instellingen_dialoog import InstellingenDialoog
+from .zoek_dialoog import ZoekDialoog
 from .thema import THEMAS, qss
 from .uitgebreid import Uitgebreid
 
@@ -102,11 +106,29 @@ class Hoofdvenster(QMainWindow):
         self.v_set = self.i_set = None
         self.uitgang = False
         self.laatste_grens_t = 0.0
+        self.laatste_stand: Stand | None = None
+        self.apparaat_naam = ""
+        self.markeringen: list[tuple[float, str]] = []
+        self.cc_sinds: float | None = None
+        self.cc_gepiept = False
+        self.meldingen = Meldingen(self.inst)
+        web = self.inst.setdefault("web", {})
+        self.telefoon = Telefoon(web.get("poort") or 8085, web.get("code") or "")
+        web["code"] = self.telefoon.code
+        self._tel_t = 0.0
         self._bouw()
+        QShortcut(QKeySequence(Qt.Key_Escape), self, self.noodstop)
+        QShortcut(QKeySequence(Qt.Key_Space), self, lambda: self._uitgang(not self.uitgang))
+        QShortcut(QKeySequence("Ctrl+K"), self, self._zoeken)
+        if web.get("aan"):
+            try:
+                self.telefoon.start()
+            except OSError as e:
+                self.l_voet.setText(f"telefoon: webserver kon niet starten ({e})")
         self.verbind()
 
     # ---------------------------------------------------------------- opbouw
-    def _bouw(self) -> None:
+    def _bouw(self, eerste: bool = True) -> None:
         self.setWindowTitle(f"Korad paneel {VERSIE}")
         self.setStyleSheet(qss(self.thema))
         grond = QWidget()
@@ -207,11 +229,35 @@ class Hoofdvenster(QMainWindow):
         root.addWidget(voet)
 
         self._menus()
-        QShortcut(QKeySequence(Qt.Key_Escape), self, self.noodstop)
-        QShortcut(QKeySequence(Qt.Key_Space), self, lambda: self._uitgang(not self.uitgang))
-        self._plaats_venster()
+        if eerste:
+            self._plaats_venster()
         self._toon_verbinding(False)
         self._kies_indeling(self.inst["indeling"].get(self.project.sleutel, "eenvoudig"))
+
+    def _herbouw(self) -> None:
+        """Alles opnieuw opbouwen in het (nieuwe) thema en de toestand terugzetten: thema wisselen zonder herstart."""
+        if self.mini is not None:
+            self.mini.close()
+            self.mini = None
+        self.sp_venster = None
+        self._bouw(eerste=False)
+        self._toon_verbinding(self.werker is not None)
+        if self.apparaat_naam:
+            self.l_apparaat.setText(self.apparaat_naam if len(self.apparaat_naam) <= 34 else self.apparaat_naam[:33] + "…")
+        if self.v_set is not None:
+            for w in self.indelingen:
+                w.toon_instellingen(self.v_set, self.i_set)
+        if self.laatste_stand is not None:
+            self._op_stand(self.laatste_stand)
+        self.uitgebreid.toon_bewaking(self.bewaking.regels, self.bewaking.actief)
+        self.eenvoudig.l_bew.tekst = "bewaking aan" if self.bewaking.actief else "bewaking uit"
+        self.eenvoudig.l_bew.zet(self.bewaking.actief)
+        self.uitgebreid.toon_log(self.log.loopt, self.log.pad.name if self.log.pad else "")
+        self.a_log.setText("Log stoppen" if self.log.loopt else "Log starten")
+        for t, tekst in self.markeringen:
+            self.uitgebreid.grafiek.markeer(t, tekst)
+            self.meetbank.grafiek.markeer(t, tekst)
+        self._toon_proef()
 
     def _plaats_venster(self) -> None:
         """Passend op het scherm (de werkruimte zonder taakbalk), en zoals de vorige keer als dat nog past."""
@@ -240,6 +286,8 @@ class Hoofdvenster(QMainWindow):
     def _menus(self) -> None:
         m = self.menu.addMenu("Bestand")
         m.addAction("Verbinden…", self._verbinden_knop)
+        m.addAction("Zoeken…", self._zoeken).setShortcut(QKeySequence("Ctrl+K"))
+        m.addSeparator()
         m.addAction("Afsluiten", self.close)
         b = self.menu.addMenu("Beeld")
         self.a_indeling = {}
@@ -270,7 +318,9 @@ class Hoofdvenster(QMainWindow):
         gm = self.menu.addMenu("Gereedschap")
         gm.addAction("Accu nabootsen…", self._accu_dialoog)
         gm.addAction("Accu nabootsen stoppen", lambda: self._stop_accu("Gestopt"))
-        self.menu.addMenu("Instellingen").addAction("komt in stap 4").setEnabled(False)
+        im = self.menu.addMenu("Instellingen")
+        im.addAction("Instellingen…", self._instellingen_dialoog).setShortcut(QKeySequence("Ctrl+,"))
+        im.addAction("Telefoon als afstandsbediening…", self._instellingen_dialoog)
 
     # ---------------------------------------------------------------- verbinding
     def verbind(self) -> None:
@@ -305,6 +355,7 @@ class Hoofdvenster(QMainWindow):
 
     def _op_verbonden(self, idn: str) -> None:
         naam = (idn or self.voeding.naam).strip()
+        self.apparaat_naam = naam
         self.l_apparaat.setToolTip(naam)
         self.l_apparaat.setText(naam if len(naam) <= 34 else naam[:33] + "…")   # de hele *IDN? past niet in de kop
         self._toon_verbinding(True)
@@ -334,6 +385,16 @@ class Hoofdvenster(QMainWindow):
 
     def _op_stand(self, s: Stand) -> None:
         self.uitgang = s.uitgang
+        self.laatste_stand = s
+        nu = time.time()
+        if s.uitgang and s.cc:                      # piep als het begrenzen langer dan een halve seconde duurt
+            if self.cc_sinds is None:
+                self.cc_sinds = nu
+            elif nu - self.cc_sinds > 0.5 and not self.cc_gepiept:
+                self.cc_gepiept = True
+                self.meldingen.cc()
+        else:
+            self.cc_sinds, self.cc_gepiept = None, False
         for w in self.indelingen:
             w.toon_stand(s)
         if self.mini is not None and self.mini.isVisible():
@@ -422,7 +483,9 @@ class Hoofdvenster(QMainWindow):
                                       oordeel_klasse="fout" if f else "goed", toelichting="\n".join(regels),
                                       soort="testprogramma")
             pad = rapport_mod.bewaar(pagina, "programma")
+            self.werkboek.voeg("programma", uitslag, pad, "\n".join(regels))
             self.l_voet.setText(f"rapport: {pad.name}")
+            self.meldingen.klaar("Programma klaar", f"{l.p.naam}: {g} goed, {f} fout" if g + f else l.p.naam)
             webbrowser.open(pad.resolve().as_uri())
 
     # ---------------------------------------------------------------- startproef (EMSN-auto-bordje)
@@ -487,9 +550,69 @@ class Hoofdvenster(QMainWindow):
         if self.sp_venster is not None:
             self.sp_venster.klaar(sp, pad)
         self._toon_proef()
+        if reden == "Klaar":
+            n = sp.telling()
+            self.meldingen.klaar("Startproef klaar", f"{n['goed']} goed, {n['dood']} dood"
+                                 + (f", {n['lus']} herstartlus" if n["lus"] else ""))
         webbrowser.open(pad.resolve().as_uri())
 
+    # ---------------------------------------------------------------- instellingen, zoeken, telefoon
+    def _zoeken(self) -> None:
+        d = ZoekDialoog(self.menu, self)
+        d.setStyleSheet(qss(self.thema))
+        d.move(self.geometry().center().x() - d.width() // 2, self.geometry().top() + 80)
+        d.exec()
+
+    def _instellingen_dialoog(self) -> None:
+        d = InstellingenDialoog(self.thema, self.inst, self.meldingen, self.telefoon, self)
+        d.setStyleSheet(qss(self.thema))
+        if d.exec() and d.uitkomst:
+            u = d.uitkomst
+            for k, v in u.items():
+                if isinstance(v, dict) and isinstance(self.inst.get(k), dict):
+                    self.inst[k].update(v)
+                else:
+                    self.inst[k] = v
+            instellingen.bewaar(self.inst)
+            if u["thema"] != self.thema.naam:
+                self._kies_thema(u["thema"])
+        else:
+            self.inst["web"]["aan"] = self.telefoon.loopt      # de telefoon kan in het venster al geschakeld zijn
+            self.inst["web"]["code"] = self.telefoon.code
+            instellingen.bewaar(self.inst)
+
+    def _telefoon_tik(self) -> None:
+        tel = self.telefoon
+        while True:
+            try:
+                op = tel.opdrachten.get_nowait()
+            except Exception:  # noqa: BLE001
+                break
+            if op[0] == "uit":
+                self.noodstop("telefoon")
+            elif op[0] == "markering":
+                self.markeer(f"telefoon: {op[1]}")
+        if not tel.loopt:
+            return
+        nu = time.time()
+        if nu - self._tel_t < 1.0:
+            return
+        self._tel_t = nu
+        recent = self.geschiedenis.tussen(nu - 300, nu)
+        stap = max(1, len(recent) // 150)
+        m = self.laatste_meting if self.werker is not None else None
+        tel.momentopname = {
+            "t": nu, "verbonden": self.werker is not None, "v": m.v if m else None, "i": m.i if m else None,
+            "vset": self.v_set if self.werker is not None else None, "iset": self.i_set if self.werker is not None else None,
+            "uit": bool(self.uitgang and self.werker is not None),
+            "cc": bool(self.laatste_stand.cc) if self.laatste_stand else False, "grens": self.project.naam,
+            "alarm": self.l_voet.text() if self.l_voet.text().startswith(("ALARM", "NOODSTOP")) else "",
+            "programma": self.uitgebreid.l_proef_naam.text() + " · " + self.uitgebreid.l_proef_tekst.text()
+            if self.uitgebreid.l_proef_naam.text() != "geen proef" else "",
+            "punten": [[round(nu - p.t, 1), round(p.v, 2), round(p.i, 4)] for p in recent[::stap]]}
+
     def _tik(self) -> None:
+        self._telefoon_tik()
         if self.startproef is not None:
             regels, self._regels = self._regels, []
             self._voer_uit(self.startproef.tik(time.time(), self.laatste_meting, regels))
@@ -529,6 +652,7 @@ class Hoofdvenster(QMainWindow):
 
     def markeer(self, tekst: str) -> None:
         t = time.time()
+        self.markeringen.append((t, tekst))
         self.uitgebreid.grafiek.markeer(t, tekst)
         self.meetbank.grafiek.markeer(t, tekst)
         self.log.markeer(t, tekst)
@@ -536,6 +660,7 @@ class Hoofdvenster(QMainWindow):
 
     def _alarm(self, tekst: str) -> None:
         self.l_voet.setText(f"ALARM {datetime.now():%H:%M:%S}: {tekst}")
+        self.meldingen.alarm(tekst)
         box = QMessageBox(QMessageBox.Warning, "Bewaking", tekst, QMessageBox.Ok, self)
         box.setModal(False)
         box.show()
@@ -703,10 +828,11 @@ class Hoofdvenster(QMainWindow):
             self.markeer(f"accu nabootsen: {reden[0].lower() + reden[1:]}")
         self._toon_proef()
 
-    def noodstop(self) -> None:
+    def noodstop(self, reden: str = "") -> None:
         self._stop_programma("NOODSTOP")
         self._stop_startproef("NOODSTOP")
         self._stop_accu("NOODSTOP")
+        self.meldingen.noodstop(reden)
         if self.werker is not None:
             self.werker.opdracht(self.voeding.zet_uitgang, False)
         self.l_voet.setText(f"NOODSTOP {datetime.now():%H:%M:%S}: uitgang uit")
@@ -744,10 +870,12 @@ class Hoofdvenster(QMainWindow):
             instellingen.bewaar(self.inst)
 
     def _kies_thema(self, sleutel: str) -> None:
+        if sleutel == self.thema.naam:
+            return
         self.thema = THEMAS[sleutel]
         self.inst["thema"] = sleutel
         instellingen.bewaar(self.inst)
-        QMessageBox.information(self, "Thema", "Het thema wisselt bij de volgende start van het paneel.")
+        self._herbouw()
 
     # ---------------------------------------------------------------- sluiten
     def closeEvent(self, ev) -> None:
@@ -766,6 +894,8 @@ class Hoofdvenster(QMainWindow):
         if self.werker is not None:
             self.werker.stop()
         self.log.stop()
+        self.telefoon.stop()
+        self.meldingen.stop()
         self._onthoud_venster()
         instellingen.bewaar(self.inst)
         ev.accept()

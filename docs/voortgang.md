@@ -38,6 +38,13 @@ Gebouwd en vastgelegd (zie `git log`):
    stroom/spanning/vermogen, tabel van verschillen, rapport), geheugenknoppen met labels uit de voeding na RCL en
    rechtsklik = bewaren (SAV), accu nabootsen (Gereedschap, met inwendige weerstand). 41 toetsen.
 
+10. **Stap 4**: meldingen uit één hand (`kern/meldingen.py`: piepjes, de Windows-stem via PowerShell zoals het
+    oude paneel, ntfy), het instellingenvenster (Ctrl+, : thema, accent, geluid, spraak met test, ntfy met
+    testmelding, telefoon aan/uit met link en QR-code, poorten), thema wisselen zonder herstart (het venster wordt
+    opnieuw opgebouwd en de toestand teruggezet), Ctrl+K zoeken over alle menu-opdrachten, de telefoon als
+    afstandsbediening (`kern/telefoon.py`, dezelfde pagina als het oude paneel), piep bij CC langer dan 0,5 s,
+    meldingen bij alarm, noodstop, programma en startproef klaar. 45 toetsen.
+
 Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/schermafdruk.py tbeam uit.png
 [eenvoudig|uitgebreid|meetbank|presentatie] [ms]`.
 
@@ -45,8 +52,7 @@ Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/sche
 
 - Stap 3c (rest): de CaraVan Guard-monitor via wifi (nagebootst en echt) en de proeven die daarop leunen:
   UPS-duurtest, ijken, spanningscontrole, bouwstappen, opstartcurve, rooktest, nachttest; onderdelentester.
-- Stap 4: ntfy, spraak, telefoon-afstandsbediening, Ctrl+K zoekvenster, instellingenvenster, accu nabootsen 2.0,
-  thema wisselen zonder herstart.
+- Stap 4 (rest): accu nabootsen 2.0 (ontlaadkrommen), accentkleur echt toepassen, logboek in SQLite.
 - Stap 5: één .exe met icoon; handboek; overstap.
 
 ## Eerste keer starten

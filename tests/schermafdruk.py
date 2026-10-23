@@ -75,6 +75,36 @@ if os.environ.get("KP_VENSTERS"):
             d.setAttribute(Qt.WA_DontShowOnScreen, True)
     QTimer.singleShot(300, vensters)
     QTimer.singleShot(wacht_ms - 900, vensters2)
+if os.environ.get("KP_STAP4"):
+    # instellingen, zoeken, en thema wisselen zonder herstart
+    def open_dialogen():
+        venster.telefoon.poort = 0
+        d = InstellingenDialoog(venster.thema, venster.inst, venster.meldingen, venster.telefoon, venster)
+        d.setStyleSheet(qss(venster.thema))
+        d.setAttribute(Qt.WA_DontShowOnScreen, True)
+        d.show()
+        d._web_schakel()
+        z = ZoekDialoog(venster.menu, venster)
+        z.setStyleSheet(qss(venster.thema))
+        z.setAttribute(Qt.WA_DontShowOnScreen, True)
+        z.veld.setText("rap")
+        z.show()
+        venster.vensters += [d, z]
+        print("ZOEK:", [z.lijst.item(k).text() for k in range(z.lijst.count())])
+        print("TELEFOON:", venster.telefoon.url())
+    def wissel():
+        for d in venster.vensters:
+            d.grab().save(uit.replace(".png", f"-{type(d).__name__.lower()}.png"))
+            d.close()
+        venster.markeer("voor de wissel")
+        venster._kies_thema("licht")
+        print("THEMA:", venster.thema.naam, "| markeringen in grafiek:", len(venster.uitgebreid.grafiek.markers),
+              "| stapel:", venster.stapel.currentWidget().__class__.__name__)
+    from koradpaneel.ui.instellingen_dialoog import InstellingenDialoog
+    from koradpaneel.ui.zoek_dialoog import ZoekDialoog
+    from koradpaneel.ui.thema import qss
+    QTimer.singleShot(500, open_dialogen)
+    QTimer.singleShot(wacht_ms - 1200, wissel)
 def klaar():
     if os.environ.get("KP_VENSTERS"):
         for k, d in enumerate(venster.vensters):
