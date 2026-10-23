@@ -150,6 +150,7 @@ class Opdracht:
     uit: bool | None = None
     markering: str | None = None
     apparaat: str | None = None      # 'pauze' | 'hervat': voor het apparaat onder test (de startproef)
+    monitor: dict | None = None      # een commando voor de CaraVan Guard-monitor, bv. {"c": "light", "i": 0, "v": 20}
 
 
 @dataclass

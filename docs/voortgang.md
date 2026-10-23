@@ -45,13 +45,21 @@ Gebouwd en vastgelegd (zie `git log`):
     afstandsbediening (`kern/telefoon.py`, dezelfde pagina als het oude paneel), piep bij CC langer dan 0,5 s,
     meldingen bij alarm, noodstop, programma en startproef klaar. 45 toetsen.
 
+11. **Stap 3c (rest)**: de CaraVan Guard-monitor via wifi (`apparaat/monitor.py`, met een nagebootste monitor die
+    op de voeding reageert: 12 V weg/terug, UPS-cel die leegloopt, strips, herstart), alle proeven als
+    toestandsmachines in `kern/proeven.py` (opstartcurve, bouwstappen met korad_bouwstappen.json, spanningscontrole,
+    ijken, UPS-duurtest, nachttest, rooktest, onderdelentester), één algemene proef-aansturing in het hoofdvenster
+    (`_start_proef`/`_stop_proef`/`_proef_klaar`: rapport, werkboek, melding), het venster CaraVan Guard (Ctrl+G,
+    zes tabbladen) en de Onderdelentester. 56 toetsen; KP_CARAVAN=1 draait curve, rooktest en een weerstandsmeting.
+12. **Veiligheid na het voorval van 23-10 (13,8 V op het bordje)**: 'uitgang aan' wordt geweigerd als de voeding
+    buiten de grens van het project staat, en bij het verbinden leest de werker meteen de instellingen en zet het
+    paneel een te hoge spanning/stroomgrens terug naar de grens.
+
 Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/schermafdruk.py tbeam uit.png
 [eenvoudig|uitgebreid|meetbank|presentatie] [ms]`.
 
 ## Nog te doen (volgorde)
 
-- Stap 3c (rest): de CaraVan Guard-monitor via wifi (nagebootst en echt) en de proeven die daarop leunen:
-  UPS-duurtest, ijken, spanningscontrole, bouwstappen, opstartcurve, rooktest, nachttest; onderdelentester.
 - Stap 4 (rest): accu nabootsen 2.0 (ontlaadkrommen), accentkleur echt toepassen, logboek in SQLite.
 - Stap 5: één .exe met icoon; handboek; overstap.
 

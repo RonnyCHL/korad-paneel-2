@@ -7,21 +7,23 @@ vier keer per seconde een nieuwe spanning naar de voeding, en alleen als die 0,0
 
 from __future__ import annotations
 
-from .geschiedenis import Meting
 from .programma import Opdracht
+from .proeven import Ctx, Proef
 
 
-class Accu:
+class Accu(Proef):
+    soort = "accu"
+
     def __init__(self, v0: float, v1: float, duur_s: float, r_ohm: float = 0.0, grens_v: float = 30.0):
         if duur_s <= 0 or r_ohm < 0 or not (0 <= v0 <= grens_v and 0 <= v1 <= grens_v):
             raise ValueError("buiten bereik")
+        super().__init__()
         self.v0, self.v1, self.duur_s, self.r, self.grens_v = v0, v1, duur_s, r_ohm, grens_v
         self.t_start = 0.0
         self.i_f: float | None = None
         self.v_bron = v0
         self.v_laatst: float | None = None
         self.t_gestuurd = 0.0
-        self.klaar = False
 
     @property
     def naam(self) -> str:
@@ -46,9 +48,10 @@ class Accu:
     def _spanning(self) -> float:
         return round(max(0.0, min(self.grens_v, self.v_bron - (self.i_f or 0.0) * self.r)), 2)
 
-    def tik(self, t: float, m: Meting | None) -> list[Opdracht]:
+    def tik(self, ctx: Ctx) -> list[Opdracht]:
         if self.klaar:
             return []
+        t, m = ctx.t, ctx.meting
         if m is not None:
             self.i_f = m.i if self.i_f is None else 0.6 * self.i_f + 0.4 * m.i
         self._f = min(1.0, (t - self.t_start) / self.duur_s)
@@ -60,8 +63,12 @@ class Accu:
             uit.append(Opdracht(v=v))
         if self._f >= 1.0:
             self.klaar = True
+            self.tekst = f"Klaar op {v:g} V.".replace(".", ",")
             uit.append(Opdracht(markering=f"accu nabootsen: klaar op {v:g} V".replace(".", ",")))
         return uit
+
+    def melding(self):
+        return None
 
     def status(self, t: float) -> str:
         rest = int(max(0.0, self.duur_s * (1 - self._frac)))

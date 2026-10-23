@@ -7,6 +7,7 @@ import pytest
 from koradpaneel.kern import logboek, vergelijk
 from koradpaneel.kern.accu import Accu
 from koradpaneel.kern.geschiedenis import Meting
+from koradpaneel.kern.proeven import Ctx
 
 OUDE_LOGS = Path(r"D:\Ronny\Tools\korad\logs")
 
@@ -56,11 +57,11 @@ def test_accu_nabootsen_zakt_mee_met_de_stroom():
     acc = Accu(13.8, 11.0, 100.0, r_ohm=0.5, grens_v=15.0)
     ops = acc.start(0.0)
     assert ops[0].v == 13.8 and "start 13,8 V" in ops[0].markering and "500 mΩ" in ops[0].markering
-    ops = acc.tik(1.0, Meting(1.0, 13.8, 1.0))          # 1 A door 0,5 ohm: 0,5 V lager (eerste meting ongefilterd)
+    ops = acc.tik(Ctx(1.0, Meting(1.0, 13.8, 1.0)))          # 1 A door 0,5 ohm: 0,5 V lager (eerste meting ongefilterd)
     assert ops and ops[0].v == pytest.approx(13.8 - 0.028 - 0.5, abs=0.02)
-    assert acc.tik(1.1, Meting(1.1, 13.8, 1.0)) == []    # hooguit 4x per seconde
+    assert acc.tik(Ctx(1.1, Meting(1.1, 13.8, 1.0))) == []    # hooguit 4x per seconde
     for t in range(2, 101):
-        ops = acc.tik(float(t), Meting(float(t), 13.0, 1.0))
+        ops = acc.tik(Ctx(float(t), Meting(float(t), 13.0, 1.0)))
     assert acc.klaar and "klaar op" in ops[-1].markering
     assert acc.v_laatst == pytest.approx(11.0 - 0.5, abs=0.01)
     assert "nog 0:00" in acc.status(100.0)

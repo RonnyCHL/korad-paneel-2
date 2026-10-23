@@ -14,7 +14,7 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
       (instellen, geheugenknoppen, programma's, accusimulatie); hoger gezet aan de voorkant met uitgang aan →
       uitgang uit en alarm. Uitzondering: de TVS-meting van de onderdelentester (met stroomgrens ≤ 1,5 mA).
 - [x] Esc = noodstop in elk venster: uitgang uit en alles stoppen.
-- [ ] Vangnet: bij sluiten met uitgang aan vragen; bij verbinden melden dat de uitgang nog aan stond; een
+- [x] Vangnet: bij sluiten met uitgang aan vragen; bij verbinden melden dat de uitgang nog aan stond; een
       onverwachte fout stopt de proef, zet de uitgang uit en schrijft `korad_fouten.log`.
 - [x] Bij spanning verhogen terwijl de uitgang aan staat: bevestiging vragen.
 - [x] Stroomgrens eerst, dan spanning, dan pas uitgang (volgorde van de commando's).
@@ -64,32 +64,32 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 ### CaraVan Guard (monitor via wifi, `/api/status` en `/api/events`)
 
-- [ ] Koppelen op adres/`caravan.local`; 12 V, stroom en UPS-cel gestippeld in de grafiek; meldingen als markering.
-- [ ] Caravanproeven (testprogramma's): walstroom weg, wiebelende stekker, zakkende spanning, rijden, lader
+- [x] Koppelen op adres/`caravan.local`; 12 V, stroom en UPS-cel gestippeld in de grafiek; meldingen als markering.
+- [x] Caravanproeven (testprogramma's): walstroom weg, wiebelende stekker, zakkende spanning, rijden, lader
       drietraps, auto starten.
-- [ ] UPS-duurtest (uitgang uit, 18650 volgen tot de monitor 30 s zwijgt; daarna desgewenst weer aan).
-- [ ] Stroommeting ijken (strips 0/25/50/75/100 %, nieuwe `INA219_SHUNT_CAL`).
-- [ ] Spanningsmeting controleren (10,5–14,8 V in elf stappen).
-- [ ] Bouwstappen draagprint (stap 0–6 uit hoofdstuk 3, zachte start, oordeel per stap, meetpunten J23,
+- [x] UPS-duurtest (uitgang uit, 18650 volgen tot de monitor 30 s zwijgt; daarna desgewenst weer aan).
+- [x] Stroommeting ijken (strips 0/25/50/75/100 %, nieuwe `INA219_SHUNT_CAL`).
+- [x] Spanningsmeting controleren (10,5–14,8 V in elf stappen).
+- [x] Bouwstappen draagprint (stap 0–6 uit hoofdstuk 3, zachte start, oordeel per stap, meetpunten J23,
       uitvaltest, I2C-adressen; voortgang in `korad_bouwstappen.json`; bouwrapport).
-- [ ] Opstartcurve (spanning in stapjes omhoog, stroom getekend, uitleg in gewone taal).
-- [ ] Rooktest na een update (monitor, firmware, zes I2C-modules, SD, 12 V- en stroommeting, stroom tegen basis,
+- [x] Opstartcurve (spanning in stapjes omhoog, stroom getekend, uitleg in gewone taal).
+- [x] Rooktest na een update (monitor, firmware, zes I2C-modules, SD, 12 V- en stroommeting, stroom tegen basis,
       strip 1 op 20 %, 15 s zonder 12 V; ring voor de uitslag; rapport).
-- [ ] Nachttest (uren meten, log in `logs/`, meldingen, rapport aan het eind; stil).
+- [x] Nachttest (uren meten, log in `logs/`, meldingen, rapport aan het eind; stil).
 
 ### EMSN-auto (T-Beam, seriële log op COM6)
 
 - [x] Startproef "Bordje: N starts" (uit/aan, i2c-keuring goed/dood/half, stroom na 3/10/30 s, poort sluiten
       vóór uit en terugzoeken na aan; rapport; werkboek).
-- [ ] Programma's: auto aan-uit (20x), laadt het (30 min), wiebelende stekker.
+- [x] Programma's: auto aan-uit (20x), laadt het (30 min), wiebelende stekker.
 
 ### Vrij
 
-- [ ] Alleen de grens van de voeding.
+- [x] Alleen de grens van de voeding.
 
 ## Gereedschap
 
-- [ ] Onderdelentester: diode/led (5 V, 10 mA), weerstand (1 V, 100 mA), TVS-diode (14 V/5 mA, dan tot 25 V/1 mA,
+- [x] Onderdelentester: diode/led (5 V, 10 mA), weerstand (1 V, 100 mA), TVS-diode (14 V/5 mA, dan tot 25 V/1 mA,
       uitval bij > 4 mA); ringmeters, schaal met zones, grafiekje; vorige instellingen terug.
 
 ## Meldingen

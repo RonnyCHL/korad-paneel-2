@@ -57,7 +57,7 @@ class Werker(QObject):
             self._thread.quit()
             return
         self.verbonden.emit(idn)
-        teller = 0
+        teller = 9                                  # meteen de instellingen lezen: staat de voeding boven de grens?
         while not self._stop:
             t0 = time.time()
             try:

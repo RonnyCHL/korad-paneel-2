@@ -17,8 +17,8 @@ import html
 import re
 from dataclasses import dataclass, field
 
-from .geschiedenis import Meting
 from .programma import Opdracht
+from .proeven import Ctx, Proef
 
 VOLT, AMP = 5.00, 2.0
 MOMENTEN = (3.0, 10.0, 30.0)
@@ -50,24 +50,26 @@ class Rij:
     resets: int = 0                             # herstarts van de ROM-bootloader in deze start
 
 
-class Startproef:
+class Startproef(Proef):
+    soort = "startproef"
+    rapport = True
+
     def __init__(self, n: int = 20, uit_s: float = 5.0, aan_s: float = 45.0, *, volt: float = VOLT,
                  amp: float = AMP, momenten: tuple = MOMENTEN):
+        super().__init__()
         self.n = max(1, int(n))
         self.uit_s = max(1.0, float(uit_s))
         self.aan_s = max(momenten[-1] + 2, float(aan_s))
         self.volt, self.amp, self.momenten = volt, amp, momenten
         self.k = 0
         self.fase = "uit"
-        self.t_start = self.t_fase = self.t1 = 0.0
+        self.t_fase = 0.0
         self.rij: Rij | None = None
         self.rijen: list[Rij] = []
         self.fw = ""
         self.klaar = False
         self.poort_open = False
         self.poort_fout = ""
-        self.tekst = ""
-        self.oordeel = ""
 
     @property
     def naam(self) -> str:
@@ -96,9 +98,10 @@ class Startproef:
         if open_ and self.rij is not None and self.fase == "aan" and self.rij.poort_s is None:
             self.rij.poort_s = round(t - self.t_fase, 1)
 
-    def tik(self, t: float, m: Meting | None, regels: list[str]) -> list[Opdracht]:
+    def tik(self, ctx: Ctx) -> list[Opdracht]:
         if self.klaar:
             return []
+        t, m, regels = ctx.t, ctx.meting, ctx.regels
         el = t - self.t_fase
         uit: list[Opdracht] = []
         if self.fase == "uit":
@@ -167,9 +170,12 @@ class Startproef:
             uit[r.oordeel if r.oordeel in uit else "?"] += 1
         return uit
 
-    def afronden(self, reden: str, t: float) -> str:
+    def stop(self, reden: str, ctx: Ctx) -> list[Opdracht]:
+        return [Opdracht(apparaat="pauze")]
+
+    def afronden(self, reden: str, ctx: Ctx) -> str:
         """De lopende start meetellen als er al een keuring was; de uitslag in één zin."""
-        self.t1 = t
+        self.t1 = ctx.t
         if self.rij is not None and self.rij.keuring:
             self._rij_klaar(self.rij)
         self.rij = None
@@ -187,6 +193,13 @@ class Startproef:
                       + (f", firmware {self.fw}" if self.fw else "") + ".")
         self.oordeel = "fout" if n["dood"] or n["lus"] else ("letop" if n["half"] or n["?"] or not tot else "goed")
         return self.tekst
+
+    def tabel_html(self, ctx: Ctx) -> str:
+        return tabel_html(self)
+
+    def melding(self):
+        n = self.telling()
+        return ("Startproef klaar", f"{n['goed']} goed, {n['dood']} dood" + (f", {n['lus']} herstartlus" if n["lus"] else ""))
 
 
 def _ma(x) -> str:

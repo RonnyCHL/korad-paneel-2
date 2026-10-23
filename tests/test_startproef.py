@@ -4,7 +4,16 @@ from pathlib import Path
 
 from koradpaneel.kern import startproef as sp_mod
 from koradpaneel.kern.geschiedenis import Meting
+from koradpaneel.kern.proeven import Ctx
 from koradpaneel.kern.startproef import Startproef, oordeel, tabel_html
+
+
+def tik(sp, t, m, regels):
+    return sp.tik(Ctx(t=t, meting=m, regels=list(regels)))
+
+
+def af(sp, reden, t):
+    return sp.afronden(reden, Ctx(t=t))
 from koradpaneel.kern.werkboek import Werkboek
 
 GOED = "i2c-keuring: sda=1 scl=1 herstel=0->sda=1 bb jjj ack 34:j 68:j 76:j"
@@ -32,29 +41,29 @@ def test_een_hele_proef_van_twee_starts():
     ops = sp.start(0.0)
     assert [(o.i, o.v) for o in ops[:2]] == [(2.0, None), (None, 5.0)]
     assert ops[2].apparaat == "pauze" and ops[3].uit is False
-    assert sp.tik(1.0, None, []) == []
-    ops = sp.tik(2.0, None, [])                          # start 1: hervat, uitgang aan
+    assert tik(sp, 1.0, None, []) == []
+    ops = tik(sp, 2.0, None, [])                          # start 1: hervat, uitgang aan
     assert [o.apparaat for o in ops][0] == "hervat" and ops[1].uit is True and ops[1].markering == "start 1"
     sp.poort(3.5, True, "COM6")
     assert sp.rij.poort_s == 1.5
-    ops = sp.tik(5.0, Meting(5.0, 5.0, 0.12), ["=== EMSN-auto 0.9.8 — X ===", GOED])
+    ops = tik(sp, 5.0, Meting(5.0, 5.0, 0.12), ["=== EMSN-auto 0.9.8 — X ===", GOED])
     assert ops == [] and sp.fw == "0.9.8" and sp.rij.oordeel == "goed" and sp.rij.boot_s == 3.0
     assert sp.rij.i == {3.0: 0.12}
-    sp.tik(13.0, Meting(13.0, 5.0, 0.08), [])
-    sp.tik(33.0, Meting(33.0, 5.0, 0.07), [])
+    tik(sp, 13.0, Meting(13.0, 5.0, 0.08), [])
+    tik(sp, 33.0, Meting(33.0, 5.0, 0.07), [])
     assert sp.rij.i == {3.0: 0.12, 10.0: 0.08, 30.0: 0.07}
-    ops = sp.tik(42.0, Meting(42.0, 5.0, 0.07), [])      # start 1 klaar: pauze, uitgang uit
+    ops = tik(sp, 42.0, Meting(42.0, 5.0, 0.07), [])      # start 1 klaar: pauze, uitgang uit
     assert [o.apparaat for o in ops][0] == "pauze" and ops[1].uit is False
     assert len(sp.rijen) == 1 and sp.rijen[0].oordeel == "goed"
     sp.poort(42.1, False, "pauze")
-    ops = sp.tik(44.0, None, [])                         # start 2
+    ops = tik(sp, 44.0, None, [])                         # start 2
     assert ops[1].markering == "start 2"
     sp.poort(46.0, True, "COM6")
-    sp.tik(47.0, Meting(47.0, 5.0, 0.3), [DOOD])
-    ops = sp.tik(84.0, Meting(84.0, 5.0, 0.3), [])
+    tik(sp, 47.0, Meting(47.0, 5.0, 0.3), [DOOD])
+    ops = tik(sp, 84.0, Meting(84.0, 5.0, 0.3), [])
     assert sp.klaar and ops == []
     assert [r.oordeel for r in sp.rijen] == ["goed", "dood"]
-    tekst = sp.afronden("Klaar", 84.0)
+    tekst = af(sp, "Klaar", 84.0)
     assert tekst == "Klaar: 2 starts, 1 goed, 1 dood, firmware 0.9.8." and sp.oordeel == "fout"
     html = tabel_html(sp)
     assert "<b>dood</b>" in html and "120 mA" in html and "1,5 s" in html
@@ -63,28 +72,28 @@ def test_een_hele_proef_van_twee_starts():
 def test_herstartlus_en_geen_poort():
     sp = Startproef(2, uit_s=1, aan_s=32)
     sp.start(0.0)
-    sp.tik(1.0, None, [])
+    tik(sp, 1.0, None, [])
     sp.poort(2.0, True, "COM6")
     rom = ["ets Jul 29 2019 12:21:46", "rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)", "entry 0x400805e4"]
     for t in (3.0, 3.2, 3.4, 3.6):
-        sp.tik(t, Meting(t, 5.0, 0.05), rom)
-    sp.tik(33.0, Meting(33.0, 5.0, 0.05), [])
+        tik(sp, t, Meting(t, 5.0, 0.05), rom)
+    tik(sp, 33.0, Meting(33.0, 5.0, 0.05), [])
     assert sp.rijen[0].oordeel == "lus" and sp.rijen[0].resets == 4
     sp.poort(33.1, False, "pauze")
-    sp.tik(34.0, None, [])
+    tik(sp, 34.0, None, [])
     sp.poort(35.0, False, "could not open port 'COM6'")
-    sp.tik(67.0, Meting(67.0, 5.0, 0.0), [])
+    tik(sp, 67.0, Meting(67.0, 5.0, 0.0), [])
     assert sp.klaar and sp.rijen[1].oordeel == "?" and "geen seriële poort" in sp.rijen[1].keuring
-    sp.afronden("Klaar", 67.0)
+    af(sp, "Klaar", 67.0)
     assert "1 herstartlus" in sp.tekst and "1 onbekend" in sp.tekst and sp.oordeel == "fout"
 
 
 def test_gestopt_halverwege_telt_de_lopende_start_mee_als_er_een_keuring_was():
     sp = Startproef(5, uit_s=1, aan_s=32)
     sp.start(0.0)
-    sp.tik(1.0, None, [])
-    sp.tik(3.0, Meting(3.0, 5.0, 0.1), [GOED])
-    assert sp.afronden("Gestopt", 4.0) == "Gestopt: 1 start, 1 goed, 0 dood."
+    tik(sp, 1.0, None, [])
+    tik(sp, 3.0, Meting(3.0, 5.0, 0.1), [GOED])
+    assert af(sp, "Gestopt", 4.0) == "Gestopt: 1 start, 1 goed, 0 dood."
     assert sp.oordeel == "goed" and sp.status(5.0) == sp.tekst
 
 
@@ -92,7 +101,7 @@ def test_status_tekst():
     sp = Startproef(3, uit_s=5, aan_s=45)
     sp.start(0.0)
     assert sp.status(2.0) == "start 1 van 3: uitgang uit, nog 3 s"
-    sp.tik(5.0, None, [])
+    tik(sp, 5.0, None, [])
     assert sp.status(7.0) == "start 1 van 3: aan sinds 2 s, poort terugzoeken, ?"
     sp.poort(8.0, True, "COM6")
     assert sp.status(9.0) == "start 1 van 3: aan sinds 4 s, poort na 3 s, ?"

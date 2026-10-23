@@ -105,7 +105,44 @@ if os.environ.get("KP_STAP4"):
     from koradpaneel.ui.thema import qss
     QTimer.singleShot(500, open_dialogen)
     QTimer.singleShot(wacht_ms - 1200, wissel)
+if os.environ.get("KP_CARAVAN"):
+    # CaraVan Guard met de nagebootste monitor: koppelen, opstartcurve, rooktest; en de onderdelentester
+    from koradpaneel.apparaat.monitor import NagebootstMonitor
+    from koradpaneel.kern import proeven as pv
+    import webbrowser
+    webbrowser.open = lambda url: print("RAPPORT:", url)
+    venster.maak_monitor = lambda adres: NagebootstMonitor(adres, stil_ms=300)
+    venster.inst["project"] = "caravan"
+    venster._project_gekozen(0)
+    QMessageBox_ja = lambda *a, **k: 16384
+    from PySide6.QtWidgets import QMessageBox
+    QMessageBox.question = staticmethod(QMessageBox_ja)
+    def open_cv():
+        venster._caravan_venster()
+        venster.cv_venster.setAttribute(Qt.WA_DontShowOnScreen, True)
+        venster._koppel_monitor("caravan.local")
+        venster._onderdelen_venster()
+        venster.od_venster.setAttribute(Qt.WA_DontShowOnScreen, True)
+        venster.vensters += [venster.cv_venster, venster.od_venster]
+    def curve():
+        ok = venster._start_curve(13.8, 0.5, stap_v=2.0, wacht=0.3)
+        print("CURVE GESTART:", ok, type(venster.proef).__name__, "| uitgang", v.uitgang, "| v_set", v.v_set)
+    def rook():
+        print("CURVE:", venster.cv_venster.laatste_curve and venster.cv_venster.laatste_curve.tekst, "| proef nu:", type(venster.proef).__name__, "| uitgang", v.uitgang, v.v_set, "| mon:", venster.mon.laatste and venster.mon.laatste.get("v"))
+        venster._start_rook("2.4.0", True, False)
+    def onderdeel():
+        print("ROOK:", venster.laatste_rook and venster.laatste_rook.tekst)
+        venster.cv_venster.tabs.setCurrentIndex(4)
+        venster._start_onderdeel("weerstand")
+    QTimer.singleShot(400, open_cv)
+    QTimer.singleShot(1500, curve)
+    QTimer.singleShot(6000, rook)
+    QTimer.singleShot(14000, onderdeel)
 def klaar():
+    if os.environ.get("KP_CARAVAN"):
+        print("ONDERDEEL:", venster.od_venster.l_kop.text(), "| monitor:", venster.mon.regel())
+        for d in venster.vensters:
+            d.grab().save(uit.replace(".png", f"-{type(d).__name__.lower()}.png"))
     if os.environ.get("KP_VENSTERS"):
         for k, d in enumerate(venster.vensters):
             d.grab().save(uit.replace(".png", f"-{type(d).__name__.lower()}.png"))

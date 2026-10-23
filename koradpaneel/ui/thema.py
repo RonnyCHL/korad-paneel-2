@@ -66,6 +66,7 @@ QPushButton:disabled {{ color: {t.inkt_vaag}; }}
 QPushButton#primair {{ background: {t.accent}; color: #FFFFFF; border: 0; font-weight: 600; padding: 12px 20px; }}
 QPushButton#gevaar {{ background: {t.gevaar}; color: #FFFFFF; border: 0; font-weight: 600; padding: 12px 20px; }}
 QPushButton#geheugen {{ padding: 8px 12px; font-size: 13px; }}
+QPushButton#geheugen:checked {{ border: 2px solid {t.accent}; color: {t.inkt}; }}
 QPushButton#menu {{ background: transparent; border: 0; padding: 8px 12px; }}
 QPushButton#menu:hover {{ background: {t.kaart}; }}
 QLineEdit {{ background: {t.veld}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px;
@@ -80,6 +81,11 @@ QTableWidget::item {{ padding: 4px 8px; border-bottom: 1px solid {t.kaart_rand};
 QHeaderView::section {{ background: {t.kaart}; color: {t.inkt_zacht}; border: 0; border-bottom: 1px solid {t.kaart_rand};
                         padding: 6px 8px; font-weight: 600; }}
 QDialog {{ background: {t.grond}; }}
+QTabWidget::pane {{ border: 1px solid {t.kaart_rand}; border-radius: 10px; top: -1px; }}
+QTabBar::tab {{ background: {t.kaart}; color: {t.inkt_zacht}; padding: 8px 16px; border: 1px solid {t.kaart_rand};
+                border-bottom: 0; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-right: 2px; }}
+QTabBar::tab:selected {{ color: {t.inkt}; background: {t.grond}; font-weight: 600; }}
+QTextEdit {{ background: {t.veld}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px; padding: 6px; }}
 QListWidget {{ background: {t.kaart}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px; padding: 6px; }}
 QListWidget::item {{ padding: 8px; border-radius: 6px; }}
 QListWidget::item:selected {{ background: {t.accent}; color: #FFFFFF; }}

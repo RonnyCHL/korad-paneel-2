@@ -16,6 +16,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 
 from koradpaneel.apparaat.bordje import Bordje, NagebootstBordje
+from koradpaneel.apparaat.monitor import Monitor, NagebootstMonitor
 from koradpaneel.ui.hoofdvenster import Hoofdvenster
 from koradpaneel.voeding import korad, nagebootst
 
@@ -34,10 +35,12 @@ def main(argv: list[str] | None = None) -> int:
     if a.nagebootst:
         maak = lambda _poort: nagebootst.Nagebootst(a.nagebootst)
         maak_bordje = lambda _poort: NagebootstBordje("wissel")
+        maak_monitor = lambda adres: NagebootstMonitor(adres)
     else:
         maak = lambda poort: korad.Korad(a.poort or poort or "COM10")
         maak_bordje = lambda poort: Bordje(poort)
-    venster = Hoofdvenster(maak, maak_bordje=maak_bordje)
+        maak_monitor = lambda adres: Monitor(adres)
+    venster = Hoofdvenster(maak, maak_bordje=maak_bordje, maak_monitor=maak_monitor)
     venster.show()
     return app.exec()
 
