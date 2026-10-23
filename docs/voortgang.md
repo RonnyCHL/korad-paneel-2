@@ -30,16 +30,21 @@ Gebouwd en vastgelegd (zie `git log`):
    1440x852. Verholpen (commit b3fd6b9): menubalk Preferred, apparaatnaam afgekapt, venster passend en onthouden,
    rolgebied als vangnet, kleinere minimummaten voor de meters.
 
+8. **Stap 3c (deel 1), 23-10 ochtend**: het apparaat onder test (`koradpaneel/apparaat`: het bordje via de seriële
+   log, en een nagebootst bordje), de startproef "Bordje: N starts" als toestandsmachine (`kern/startproef.py`)
+   met venster (Ctrl+B), rapport met tabel per start, en de werkboek-kern.
+9. **Stap 2d**: werkboek-venster (Ctrl+W: zoeken, staafje per dag, openen, notitie, mappen doorzoeken, het oude
+   werkboek inlezen), oude logs openen in de grafiek (Ctrl+O, ook het oude CSV-formaat), logs vergelijken (A/B,
+   stroom/spanning/vermogen, tabel van verschillen, rapport), geheugenknoppen met labels uit de voeding na RCL en
+   rechtsklik = bewaren (SAV), accu nabootsen (Gereedschap, met inwendige weerstand). 41 toetsen.
+
 Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/schermafdruk.py tbeam uit.png
 [eenvoudig|uitgebreid|meetbank|presentatie] [ms]`.
 
 ## Nog te doen (volgorde)
 
-- Stap 2d: oude logs openen en vergelijken, werkboek, geheugenknoppen met labels uit de voeding (SAV/RCL),
-  accu nabootsen.
-- Stap 3c: het "apparaat onder test" (CaraVan Guard via wifi, EMSN-auto via de seriële log) en de proeven die
-  daarop leunen: UPS-duurtest, ijken, spanningscontrole, bouwstappen, opstartcurve, rooktest, nachttest,
-  startproef bordje, onderdelentester. Eerst de nagebootste monitor en het nagebootste bordje, dan de echte.
+- Stap 3c (rest): de CaraVan Guard-monitor via wifi (nagebootst en echt) en de proeven die daarop leunen:
+  UPS-duurtest, ijken, spanningscontrole, bouwstappen, opstartcurve, rooktest, nachttest; onderdelentester.
 - Stap 4: ntfy, spraak, telefoon-afstandsbediening, Ctrl+K zoekvenster, instellingenvenster, accu nabootsen 2.0,
   thema wisselen zonder herstart.
 - Stap 5: één .exe met icoon; handboek; overstap.

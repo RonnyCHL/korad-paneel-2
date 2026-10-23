@@ -46,6 +46,7 @@ class Grafiek(QWidget):
             w.showGrid(x=True, y=True, alpha=0.12)
             w.getAxis("left").setWidth(56)
             w.getAxis("left").setLabel(naam)
+            w.getAxis("left").enableAutoSIPrefix(False)      # anders staat er "A (x0.001)" bij kleine stromen
             w.setMouseEnabled(x=True, y=False)
             w.setMenuEnabled(False)
             w.hideButtons()

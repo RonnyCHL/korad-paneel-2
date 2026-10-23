@@ -59,17 +59,33 @@ class CsvLog:
 
 
 def lees(pad: Path) -> tuple[list[Meting], list[tuple[float, str]]]:
-    """Een log terugleden: de metingen en de markeringen."""
+    """Een log teruglezen: de metingen en de markeringen. Leest ook de logs van het oude paneel
+    (komma's, kolommen tijd,spanning_V,stroom_A,...; markeringen met ' | ' aaneengeregen)."""
     metingen, markeringen = [], []
     with open(pad, newline="", encoding="utf-8") as f:
-        r = csv.reader(f, delimiter=";")
-        next(r, None)
-        for rij in r:
-            if len(rij) < 6:
-                continue
-            t = float(rij[1])
-            if rij[5]:
-                markeringen.append((t, rij[5]))
-            elif rij[2]:
-                metingen.append(Meting(t=t, v=float(rij[2]), i=float(rij[3])))
+        kop = f.readline()
+        f.seek(0)
+        if kop.startswith("tijd,"):
+            for rij in csv.DictReader(f):
+                try:
+                    t = datetime.fromisoformat(rij["tijd"]).timestamp()
+                    metingen.append(Meting(t=t, v=float(rij["spanning_V"]), i=float(rij["stroom_A"])))
+                except (KeyError, ValueError):
+                    continue
+                for deel in (rij.get("markering") or "").split(" | "):
+                    if deel.strip():
+                        markeringen.append((t, deel.strip()))
+        else:
+            r = csv.reader(f, delimiter=";")
+            next(r, None)
+            for rij in r:
+                if len(rij) < 6:
+                    continue
+                t = float(rij[1])
+                if rij[5]:
+                    markeringen.append((t, rij[5]))
+                elif rij[2]:
+                    metingen.append(Meting(t=t, v=float(rij[2]), i=float(rij[3])))
+    metingen.sort(key=lambda m: m.t)
+    markeringen.sort(key=lambda x: x[0])
     return metingen, markeringen

@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEd
 
 from ..kern.geschiedenis import Energieteller, Geschiedenis, Meting
 from ..voeding.basis import Stand
-from .eenvoudig import Lampje, getal, nl
+from .eenvoudig import Lampje, geheugenknop, getal, nl
 from .grafiek import Grafiek
 from .meters import RingMeter
 from .thema import Thema
@@ -35,6 +35,7 @@ class Uitgebreid(QWidget):
     instellen = Signal(float, float)
     uitgang = Signal(bool)
     geheugen = Signal(int)
+    geheugen_bewaren = Signal(int)
     markering = Signal(str)
     log = Signal(bool)                 # log starten/stoppen
     bewaking_instellen = Signal()
@@ -156,9 +157,7 @@ class Uitgebreid(QWidget):
         geh = QHBoxLayout()
         self.k_geheugen = []
         for n in range(1, 5):
-            k = QPushButton(geheugens.get(str(n), f"M{n}"))
-            k.setObjectName("geheugen")
-            k.clicked.connect(lambda _=False, n=n: self.geheugen.emit(n))
+            k = geheugenknop(geheugens.get(str(n), f"M{n}"), n, self.geheugen, self.geheugen_bewaren)
             geh.addWidget(k)
             self.k_geheugen.append(k)
         geh.addStretch(1)

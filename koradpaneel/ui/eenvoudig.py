@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QVBoxLayout,
+from PySide6.QtWidgets import (QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton, QVBoxLayout,
                                QWidget)
 
 from ..kern.geschiedenis import Meting
@@ -37,10 +37,28 @@ class Lampje(QLabel):
         self.setText(f'<span style="color:{bol}">●</span>&nbsp; <span style="color:{inkt}">{self.tekst}</span>')
 
 
+def geheugenknop(tekst: str, n: int, ophalen: Signal, bewaren: Signal) -> QPushButton:
+    """Een geheugenknop: klik = ophalen (RCL), rechtsklik = de huidige instelling hier bewaren (SAV)."""
+    k = QPushButton(tekst)
+    k.setObjectName("geheugen")
+    k.setToolTip(f"Geheugen M{n}: klik = ophalen, rechtsklik = huidige instelling hier bewaren")
+    k.clicked.connect(lambda _=False: ophalen.emit(n))
+    k.setContextMenuPolicy(Qt.CustomContextMenu)
+
+    def menu(pos):
+        m = QMenu(k)
+        m.addAction(f"Huidige instelling bewaren in M{n}", lambda: bewaren.emit(n))
+        m.exec(k.mapToGlobal(pos))
+
+    k.customContextMenuRequested.connect(menu)
+    return k
+
+
 class Eenvoudig(QWidget):
     instellen = Signal(float, float)      # spanning, stroomgrens
     uitgang = Signal(bool)                # gewenste stand
     geheugen = Signal(int)
+    geheugen_bewaren = Signal(int)
 
     def __init__(self, thema: Thema, vmax: float, imax: float, geheugens: dict):
         super().__init__()
@@ -103,9 +121,7 @@ class Eenvoudig(QWidget):
         bed.addSpacing(10)
         self.k_geheugen: list[QPushButton] = []
         for n in range(1, 5):
-            k = QPushButton(geheugens.get(str(n), f"M{n}"))
-            k.setObjectName("geheugen")
-            k.clicked.connect(lambda _=False, n=n: self.geheugen.emit(n))
+            k = geheugenknop(geheugens.get(str(n), f"M{n}"), n, self.geheugen, self.geheugen_bewaren)
             bed.addWidget(k)
             self.k_geheugen.append(k)
         bed.addStretch(1)

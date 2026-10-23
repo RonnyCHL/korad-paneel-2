@@ -54,7 +54,32 @@ if os.environ.get("KP_STARTPROEF"):
     QTimer.singleShot(600, lambda: venster._start_startproef(3, 1.0, 3.0, "COM6"))
     QTimer.singleShot(wacht_ms - 400, lambda: print("STARTPROEF:", venster.l_voet.text(), "| rijen:",
                                                      [(r.nr, r.oordeel, r.poort_s) for r in (venster.startproef.rijen if venster.startproef else [])]))
+if os.environ.get("KP_VENSTERS"):
+    # de vensters van stap 2d: werkboek, log bekijken, logs vergelijken (met de oude logs van het tkinter-paneel)
+    from pathlib import Path
+    from koradpaneel.kern import logboek
+    oude = sorted(Path(r"D:\Ronny\Tools\korad\logs").glob("*.csv"))
+    def vensters():
+        venster._werkboek()
+        venster._log(True)
+    def vensters2():
+        venster._log(False)
+        if oude:
+            venster._log_openen(oude[-1])
+        venster._logs_vergelijken()
+        d = venster.vensters[-1]
+        for s, pad in zip(("A", "B"), oude[-2:]):
+            d.logs[s] = (pad, logboek.lees(pad)[0])
+        d._ververs()
+        for k, d in enumerate(venster.vensters):
+            d.setAttribute(Qt.WA_DontShowOnScreen, True)
+    QTimer.singleShot(300, vensters)
+    QTimer.singleShot(wacht_ms - 900, vensters2)
 def klaar():
+    if os.environ.get("KP_VENSTERS"):
+        for k, d in enumerate(venster.vensters):
+            d.grab().save(uit.replace(".png", f"-{type(d).__name__.lower()}.png"))
+            print("venster", type(d).__name__, d.size())
     if os.environ.get("KP_STARTPROEF") and venster.sp_venster is not None:
         venster.sp_venster.grab().save(uit.replace(".png", "-venster.png"))
         print("UITSLAG:", venster.sp_venster.l_uitslag.text())

@@ -32,8 +32,8 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 - [x] Spanning en stroomgrens invullen en Instellen.
 - [x] Uitgang aan/uit.
-- [ ] Vier geheugenknoppen (M1–M4) met labels die uit de voeding gelezen worden na gebruik.
-- [ ] Accu nabootsen: van … V naar … V in … minuten met inwendige weerstand R (spanning zakt mee met de stroom).
+- [x] Vier geheugenknoppen (M1–M4) met labels die uit de voeding gelezen worden na gebruik.
+- [x] Accu nabootsen: van … V naar … V in … minuten met inwendige weerstand R (spanning zakt mee met de stroom).
 - [x] Notitie als markering in grafiek, log en rapport.
 - [x] Mini-venster, altijd bovenop: spanning, stroom, CC en een uit-knop.
 
@@ -43,9 +43,9 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
       1 min, 5 min, 30 min.
 - [x] Markeringen in de grafiek (eigen notities, stappen van programma's, meldingen van de monitor, grens).
 - [x] CSV-log starten/stoppen (kolommen tijd, V, A, en monitor_V, monitor_A, ups_V als de monitor gekoppeld is).
-- [ ] Oude logs openen in de grafiek; logs vergelijken (twee over elkaar, tabel van verschillen, rapport).
+- [x] Oude logs openen in de grafiek; logs vergelijken (twee over elkaar, tabel van verschillen, rapport).
 - [x] HTML-rapport van een stuk grafiek (afdrukbaar als PDF).
-- [ ] Werkboek: alles wat gemeten is op datum (soort, titel, bestand, uitleg), staafgrafiek per dag, zoeken,
+- [x] Werkboek: alles wat gemeten is op datum (soort, titel, bestand, uitleg), staafgrafiek per dag, zoeken,
       dubbelklik opent log of rapport; map scannen voor oude rapporten/logs.
 
 ## Bewaking

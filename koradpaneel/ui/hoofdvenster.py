@@ -22,6 +22,7 @@ from ..kern.geschiedenis import Energieteller, Geschiedenis, Meting
 from ..kern import rapport as rapport_mod
 from ..kern import programma as pr
 from ..kern import startproef as sp_mod
+from ..kern.accu import Accu
 from ..kern.bewaking import Bewaking
 from ..kern.werkboek import Werkboek
 from ..apparaat.bordje import Bordje
@@ -36,6 +37,9 @@ from .mini import Mini
 from .presentatie import Presentatie
 from .programmas import ProgrammaVenster
 from .startproef import StartproefVenster
+from .accu_dialoog import AccuDialoog
+from .logvenster import LogVenster, VergelijkVenster, kies_log, laad_log
+from .werkboek_venster import WerkboekVenster
 from .thema import THEMAS, qss
 from .uitgebreid import Uitgebreid
 
@@ -92,6 +96,9 @@ class Hoofdvenster(QMainWindow):
         self.sp_venster = None
         self.werkboek = Werkboek()
         self.werkboek.laad()
+        self.accu = None
+        self.rcl_wacht: tuple[int, float] | None = None     # (geheugenplaats, tijdstip) na RCL/SAV
+        self.vensters: list = []                               # open vensters (logs, werkboek) in leven houden
         self.v_set = self.i_set = None
         self.uitgang = False
         self.laatste_grens_t = 0.0
@@ -148,18 +155,20 @@ class Hoofdvenster(QMainWindow):
         self.eenvoudig.instellen.connect(self._zet)
         self.eenvoudig.uitgang.connect(self._uitgang)
         self.eenvoudig.geheugen.connect(self._geheugen)
+        self.eenvoudig.geheugen_bewaren.connect(self._geheugen_bewaren)
         self.stapel.addWidget(self.eenvoudig)
         self.uitgebreid = Uitgebreid(self.thema, self.project.vmax, self.project.imax, self.inst["geheugens"],
                                      self.geschiedenis)
         self.uitgebreid.instellen.connect(self._zet)
         self.uitgebreid.uitgang.connect(self._uitgang)
         self.uitgebreid.geheugen.connect(self._geheugen)
+        self.uitgebreid.geheugen_bewaren.connect(self._geheugen_bewaren)
         self.uitgebreid.markering.connect(self.markeer)
         self.uitgebreid.log.connect(self._log)
         self.uitgebreid.bewaking_instellen.connect(self._bewaking_dialoog)
         self.uitgebreid.rapport.connect(lambda a, b: self._rapport(a, b, "Grafiek in beeld"))
         self.uitgebreid.k_nul.clicked.connect(lambda: self.energie.op_nul(time.time()))
-        self.uitgebreid.k_proef_stop.clicked.connect(lambda: self._stop_programma("Gestopt"))
+        self.uitgebreid.k_proef_stop.clicked.connect(self._stop_alles)
         self.uitgebreid.toon_bewaking(self.bewaking.regels, self.bewaking.actief)
         self.stapel.addWidget(self.uitgebreid)
         self.meetbank = Meetbank(self.thema, self.project.vmax, self.project.imax, self.geschiedenis)
@@ -250,8 +259,17 @@ class Hoofdvenster(QMainWindow):
         pm.addAction("Programma stoppen", lambda: self._stop_programma("Gestopt"))
         pm.addSeparator()
         pm.addAction("EMSN-auto: bordje starten…", self._startproef_venster).setShortcut(QKeySequence("Ctrl+B"))
-        self.menu.addMenu("Logboek").addAction("komt in stap 2").setEnabled(False)
-        self.menu.addMenu("Gereedschap").addAction("komt in stap 3").setEnabled(False)
+        lm = self.menu.addMenu("Logboek")
+        lm.addAction("Werkboek…", self._werkboek).setShortcut(QKeySequence("Ctrl+W"))
+        lm.addSeparator()
+        lm.addAction("Log openen…", self._log_openen).setShortcut(QKeySequence("Ctrl+O"))
+        lm.addAction("Logs vergelijken…", self._logs_vergelijken)
+        lm.addSeparator()
+        self.a_log = lm.addAction("Log starten", lambda: self._log(not self.log.loopt))
+        self.a_log.setShortcut(QKeySequence("Ctrl+L"))
+        gm = self.menu.addMenu("Gereedschap")
+        gm.addAction("Accu nabootsen…", self._accu_dialoog)
+        gm.addAction("Accu nabootsen stoppen", lambda: self._stop_accu("Gestopt"))
         self.menu.addMenu("Instellingen").addAction("komt in stap 4").setEnabled(False)
 
     # ---------------------------------------------------------------- verbinding
@@ -357,6 +375,9 @@ class Hoofdvenster(QMainWindow):
         if sp is not None:
             self.uitgebreid.toon_proef(sp.naam, sp.voortgang, sp.status(time.time()), True)
             return
+        if self.accu is not None:
+            self.uitgebreid.toon_proef(self.accu.naam, self.accu.voortgang, self.accu.status(time.time()), True)
+            return
         if l is None:
             self.uitgebreid.toon_proef("geen proef", 0.0, "Kies een programma via het menu Proeven.", False)
             return
@@ -372,6 +393,11 @@ class Hoofdvenster(QMainWindow):
         if g + f:
             delen.append(f"{g} goed, {f} fout")
         self.uitgebreid.toon_proef(l.p.naam, l.voortgang, " · ".join(delen), True)
+
+    def _stop_alles(self) -> None:
+        self._stop_programma("Gestopt")
+        self._stop_startproef("Gestopt")
+        self._stop_accu("Gestopt")
 
     def _stop_programma(self, reden: str, rapport: bool = False) -> None:
         l, self.loop = self.loop, None
@@ -473,6 +499,12 @@ class Hoofdvenster(QMainWindow):
                 if self.sp_venster is not None:
                     self.sp_venster.toon(self.startproef)
                 self._toon_proef()
+        if self.accu is not None:
+            self._voer_uit(self.accu.tik(time.time(), self.laatste_meting))
+            if self.accu.klaar:
+                self._stop_accu("Klaar")
+            else:
+                self._toon_proef()
         if self.loop is not None:
             self._voer_uit(self.loop.tik(time.time(), self.laatste_meting))
             if self.loop.klaar:
@@ -536,9 +568,13 @@ class Hoofdvenster(QMainWindow):
             pad = self.log.stop()
             self.l_voet.setText(f"log gesloten: {pad.name if pad else ''} ({self.log.regels} metingen)")
         self.uitgebreid.toon_log(aan)
+        self.a_log.setText("Log stoppen" if aan else "Log starten")
 
     def _op_instellingen(self, v: float, i: float) -> None:
         self.v_set, self.i_set = v, i
+        if self.rcl_wacht is not None and time.time() > self.rcl_wacht[1]:
+            n, self.rcl_wacht = self.rcl_wacht[0], None      # na een geheugenknop: onthoud wat erin zit
+            self._geheugen_label(n, v, i)
         for w in self.indelingen:
             w.toon_instellingen(v, i)
         # De voeding kan aan de voorkant hoger gezet zijn dan de grens: dan grijpt het paneel in.
@@ -577,11 +613,100 @@ class Hoofdvenster(QMainWindow):
         self._stuur(self.voeding.zet_uitgang, aan)
 
     def _geheugen(self, n: int) -> None:
-        self._stuur(self.voeding.geheugen_ophalen, n)
+        tekst = self.inst["geheugens"].get(str(n), "")
+        try:                                   # de grens vooraf toetsen op wat we van deze plaats weten
+            v_t, i_t = (float(x.split()[0].replace(",", ".")) for x in tekst.split("\n")[:2])
+        except (ValueError, IndexError):
+            v_t = i_t = None
+        if v_t is not None and not self.project.binnen(v_t, i_t):
+            QMessageBox.warning(self, "Buiten de grens", f"Geheugen M{n} staat op {tekst.replace(chr(10), ' / ')}.\n\n"
+                                + self.project.uitleg())
+            return
+        if v_t is not None and self.uitgang and self.v_set is not None and v_t > self.v_set + 0.05:
+            if QMessageBox.question(self, "Hogere spanning op de uitgang",
+                                    f"De uitgang staat aan. Deze knop verhoogt de spanning van {nl(self.v_set, 2)} V "
+                                    f"naar {nl(v_t, 2)} V, direct op wat er nu is aangesloten.\n\nDoorgaan?") != QMessageBox.Yes:
+                return
+        self._stop_accu("Gestopt: geheugenknop gebruikt")
+        self._stop_programma("Gestopt: geheugenknop gebruikt")
+        if self._stuur(self.voeding.geheugen_ophalen, n):
+            self.rcl_wacht = (n, time.time())
+
+    def _geheugen_bewaren(self, n: int) -> None:
+        if self.v_set is None:
+            return
+        if QMessageBox.question(self, f"Bewaren in M{n}", f"De huidige instelling ({nl(self.v_set, 2)} V, "
+                                f"{nl(self.i_set, 3)} A) bewaren in geheugen M{n} van de voeding?") != QMessageBox.Yes:
+            return
+        if self._stuur(self.voeding.geheugen_bewaren, n):
+            self.rcl_wacht = (n, time.time())
+
+    def _geheugen_label(self, n: int, v: float, i: float) -> None:
+        tekst = f"{nl(v, 2).rstrip('0').rstrip(',')} V\n{nl(i, 3).rstrip('0').rstrip(',')} A"
+        self.inst["geheugens"][str(n)] = tekst
+        instellingen.bewaar(self.inst)
+        for w in (self.eenvoudig, self.uitgebreid):
+            w.k_geheugen[n - 1].setText(tekst)
+
+    # ---------------------------------------------------------------- logboek, logs, werkboek
+    def _werkboek(self) -> None:
+        d = WerkboekVenster(self.thema, self.werkboek, self)
+        d.setStyleSheet(qss(self.thema))
+        d.open_log.connect(self._log_openen)
+        d.show()
+        self.vensters.append(d)
+
+    def _log_openen(self, pad=None) -> None:
+        if pad is None:
+            pad = kies_log(self, "Log openen")
+            if pad is None:
+                return
+        uit = laad_log(self, pad)
+        if uit is None:
+            return
+        d = LogVenster(self.thema, pad, uit[0], uit[1], self)
+        d.setStyleSheet(qss(self.thema))
+        d.show()
+        self.vensters.append(d)
+
+    def _logs_vergelijken(self) -> None:
+        d = VergelijkVenster(self.thema, self)
+        d.setStyleSheet(qss(self.thema))
+        d.show()
+        self.vensters.append(d)
+
+    # ---------------------------------------------------------------- accu nabootsen
+    def _accu_dialoog(self) -> None:
+        if self.werker is None:
+            QMessageBox.information(self, "Niet verbonden", "Verbind eerst met de voeding.")
+            return
+        d = AccuDialoog(self.project.vmax, self.v_set, self)
+        d.setStyleSheet(qss(self.thema))
+        if d.exec() and d.uitkomst:
+            v0, v1, duur_s, r = d.uitkomst
+            if self.uitgang and self.v_set is not None and v0 > self.v_set + 0.05:
+                if QMessageBox.question(self, "Hogere spanning op de uitgang",
+                                        f"De uitgang staat aan. De accu begint op {nl(v0, 2)} V, hoger dan de huidige "
+                                        f"{nl(self.v_set, 2)} V, direct op wat er nu is aangesloten.\n\nDoorgaan?") != QMessageBox.Yes:
+                    return
+            self._stop_programma("Gestopt: accu nabootsen gestart")
+            self._stop_accu("Gestopt: opnieuw gestart")
+            self.accu = Accu(v0, v1, duur_s, r, self.project.vmax)
+            self._voer_uit(self.accu.start(time.time()))
+            self._toon_proef()
+
+    def _stop_accu(self, reden: str) -> None:
+        a, self.accu = self.accu, None
+        if a is None:
+            return
+        if not a.klaar:
+            self.markeer(f"accu nabootsen: {reden[0].lower() + reden[1:]}")
+        self._toon_proef()
 
     def noodstop(self) -> None:
         self._stop_programma("NOODSTOP")
         self._stop_startproef("NOODSTOP")
+        self._stop_accu("NOODSTOP")
         if self.werker is not None:
             self.werker.opdracht(self.voeding.zet_uitgang, False)
         self.l_voet.setText(f"NOODSTOP {datetime.now():%H:%M:%S}: uitgang uit")
