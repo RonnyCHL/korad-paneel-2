@@ -58,7 +58,8 @@ def _svg(pts: list[Meting], markers: list[tuple[float, str]], kleur_v: str, kleu
 
 def maak(titel: str, pts: list[Meting], markers: list[tuple[float, str]], *, apparaat: str = "",
          project: str = "", v_set: float | None = None, i_set: float | None = None, oordeel: str = "",
-         oordeel_klasse: str = "goed", toelichting: str = "", soort: str = "rapport") -> str:
+         oordeel_klasse: str = "goed", toelichting: str = "", soort: str = "rapport",
+         extra_html: str = "") -> str:
     esc = html.escape
     w = venster_uit(pts) if pts else None
     getallen = "" if not w else f"""
@@ -81,6 +82,8 @@ def maak(titel: str, pts: list[Meting], markers: list[tuple[float, str]], *, app
   .verdict {{ font-size: 16px; font-weight: 600; margin: 14px 0; padding: 10px 14px; border-radius: 6px; }}
   .goed {{ background: #E3F4E1; color: #1E6B2E; }} .letop {{ background: #FFF2CC; color: #7A5A00; }}
   .fout {{ background: #FADDDA; color: #8E1B1B; }}
+  td.goed, td.letop, td.fout {{ background: none; }} td.goed {{ color: #1E6B2E; }} td.letop {{ color: #7A5A00; }}
+  td.fout {{ color: #8E1B1B; }} code {{ font-size: 12px; }}
   table {{ border-collapse: collapse; width: 100%; font-size: 13px; }} th, td {{ border-bottom: 1px solid #E6E0D0; padding: 6px 8px; text-align: left; }}
   svg {{ width: 100%; height: auto; }} .t {{ font-size: 10px; fill: #6B7280; }} .m {{ font-size: 10px; fill: #4B5563; }}
   @media print {{ body {{ background: white; }} .page {{ margin: 0; border: none; padding: 0; }} }}
@@ -91,6 +94,7 @@ def maak(titel: str, pts: list[Meting], markers: list[tuple[float, str]], *, app
     f", met {esc(apparaat)}" if apparaat else ""}{esc(inst)}{f"; project {esc(project)}" if project else ""}.</p>
   {f'<p class="verdict {oordeel_klasse}">{esc(oordeel)}</p>' if oordeel else ""}
   {f'<p>{esc(toelichting)}</p>' if toelichting else ""}
+  {extra_html}
   {getallen}
   {"<h2>Spanning en stroom</h2>" + _svg(pts, markers, "#D9484A", "#C7791A") if len(pts) >= 2 else ""}
   {markering_tabel}

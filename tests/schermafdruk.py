@@ -40,7 +40,24 @@ if os.environ.get("KP_PROGRAMMA"):
         pr.Stap("helling", 3.0, 1.0, "aan", 2.0)])
     QTimer.singleShot(600, lambda: venster._start_programma(prog))
     QTimer.singleShot(2200, lambda: print("LOPEND:", venster.uitgebreid.l_proef_tekst.text()))
+if os.environ.get("KP_STARTPROEF"):
+    # de startproef tegen het nagebootste bordje: 3 starts, kort
+    from koradpaneel.apparaat.bordje import NagebootstBordje
+    from koradpaneel.kern import startproef as sp_mod
+    import webbrowser
+    webbrowser.open = lambda url: print("RAPPORT:", url)
+    _Orig = sp_mod.Startproef
+    sp_mod.Startproef = lambda n, u, a, **kw: _Orig(n, u, a, momenten=(0.5, 1.0, 2.0), **kw)
+    venster.maak_bordje = lambda _p: NagebootstBordje("wissel", poort_s=0.3, boot_s=0.6)
+    venster.inst.setdefault("emsn", {})
+    QTimer.singleShot(400, lambda: (venster._startproef_venster(), venster.sp_venster.setAttribute(Qt.WA_DontShowOnScreen, True)))
+    QTimer.singleShot(600, lambda: venster._start_startproef(3, 1.0, 3.0, "COM6"))
+    QTimer.singleShot(wacht_ms - 400, lambda: print("STARTPROEF:", venster.l_voet.text(), "| rijen:",
+                                                     [(r.nr, r.oordeel, r.poort_s) for r in (venster.startproef.rijen if venster.startproef else [])]))
 def klaar():
+    if os.environ.get("KP_STARTPROEF") and venster.sp_venster is not None:
+        venster.sp_venster.grab().save(uit.replace(".png", "-venster.png"))
+        print("UITSLAG:", venster.sp_venster.l_uitslag.text())
     if os.environ.get("KP_PROGRAMMA"):
         print("UITSLAG:", venster.l_voet.text(), "| markeringen:", [m[1] for m in venster.uitgebreid.grafiek.markers][-6:])
     venster.grab().save(uit)

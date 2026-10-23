@@ -7,3 +7,6 @@ dist/
 *.log
 korad_instellingen.json
 schermafdruk*.png
+korad_werkboek.json
+rapporten/
+logs/

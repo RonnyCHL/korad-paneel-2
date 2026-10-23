@@ -149,6 +149,7 @@ class Opdracht:
     i: float | None = None
     uit: bool | None = None
     markering: str | None = None
+    apparaat: str | None = None      # 'pauze' | 'hervat': voor het apparaat onder test (de startproef)
 
 
 @dataclass

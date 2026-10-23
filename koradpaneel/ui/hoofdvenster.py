@@ -21,7 +21,10 @@ from ..kern import grenzen, instellingen
 from ..kern.geschiedenis import Energieteller, Geschiedenis, Meting
 from ..kern import rapport as rapport_mod
 from ..kern import programma as pr
+from ..kern import startproef as sp_mod
 from ..kern.bewaking import Bewaking
+from ..kern.werkboek import Werkboek
+from ..apparaat.bordje import Bordje
 from ..kern.logboek import CsvLog
 from ..voeding import poorten
 from ..voeding.basis import Stand, Voeding
@@ -32,6 +35,7 @@ from .meetbank import Meetbank
 from .mini import Mini
 from .presentatie import Presentatie
 from .programmas import ProgrammaVenster
+from .startproef import StartproefVenster
 from .thema import THEMAS, qss
 from .uitgebreid import Uitgebreid
 
@@ -64,11 +68,12 @@ class Rolinhoud(QWidget):
 
 
 class Hoofdvenster(QMainWindow):
-    def __init__(self, maak_voeding, inst: dict | None = None):
+    def __init__(self, maak_voeding, inst: dict | None = None, maak_bordje=None):
         """`maak_voeding(poort) -> Voeding`: de fabriek, zodat het venster niet weet of het de Korad of de
-        nagebootste voeding is."""
+        nagebootste voeding is. `maak_bordje(poort) -> Apparaat`: idem voor het bordje onder test."""
         super().__init__()
         self.maak_voeding = maak_voeding
+        self.maak_bordje = maak_bordje or (lambda poort: Bordje(poort))
         self.inst = inst if inst is not None else instellingen.laad()
         self.project = grenzen.project(self.inst["project"])
         self.thema = THEMAS.get(self.inst["thema"], THEMAS["donker"])
@@ -81,6 +86,12 @@ class Hoofdvenster(QMainWindow):
         self.bewaking.laad()
         self.loop = None
         self.laatste_meting = None
+        self.startproef = None
+        self.apparaat = None
+        self._regels: list[str] = []
+        self.sp_venster = None
+        self.werkboek = Werkboek()
+        self.werkboek.laad()
         self.v_set = self.i_set = None
         self.uitgang = False
         self.laatste_grens_t = 0.0
@@ -237,6 +248,8 @@ class Hoofdvenster(QMainWindow):
         pm = self.menu.addMenu("Proeven")
         pm.addAction("Testprogramma's…", self._programmas).setShortcut(QKeySequence("Ctrl+P"))
         pm.addAction("Programma stoppen", lambda: self._stop_programma("Gestopt"))
+        pm.addSeparator()
+        pm.addAction("EMSN-auto: bordje starten…", self._startproef_venster).setShortcut(QKeySequence("Ctrl+B"))
         self.menu.addMenu("Logboek").addAction("komt in stap 2").setEnabled(False)
         self.menu.addMenu("Gereedschap").addAction("komt in stap 3").setEnabled(False)
         self.menu.addMenu("Instellingen").addAction("komt in stap 4").setEnabled(False)
@@ -335,9 +348,15 @@ class Hoofdvenster(QMainWindow):
                 self._stuur(self.voeding.zet_uitgang, o.uit)
             if o.markering:
                 self.markeer(o.markering)
+            if o.apparaat and self.apparaat is not None:
+                (self.apparaat.pauze if o.apparaat == "pauze" else self.apparaat.hervat)()
 
     def _toon_proef(self) -> None:
         l = self.loop
+        sp = self.startproef
+        if sp is not None:
+            self.uitgebreid.toon_proef(sp.naam, sp.voortgang, sp.status(time.time()), True)
+            return
         if l is None:
             self.uitgebreid.toon_proef("geen proef", 0.0, "Kies een programma via het menu Proeven.", False)
             return
@@ -380,7 +399,80 @@ class Hoofdvenster(QMainWindow):
             self.l_voet.setText(f"rapport: {pad.name}")
             webbrowser.open(pad.resolve().as_uri())
 
+    # ---------------------------------------------------------------- startproef (EMSN-auto-bordje)
+    def _startproef_venster(self) -> None:
+        if self.sp_venster is None:
+            self.sp_venster = StartproefVenster(self.thema, self.inst.get("emsn", {}).get("poort") or "COM6", self)
+            self.sp_venster.setStyleSheet(qss(self.thema))
+            self.sp_venster.start.connect(self._start_startproef)
+            self.sp_venster.stop.connect(lambda: self._stop_startproef("Gestopt"))
+        self.sp_venster.show()
+        self.sp_venster.raise_()
+
+    def _start_startproef(self, n: int, uit_s: float, aan_s: float, poort: str) -> None:
+        if self.werker is None:
+            QMessageBox.information(self, "Niet verbonden", "Verbind eerst met de voeding.")
+            return
+        if self.project.vmax < sp_mod.VOLT or self.project.imax < 1.0:
+            QMessageBox.information(self, "Grens", 'Kies bovenin het project "EMSN-auto" (max 5,5 V, 2 A) of "Vrij".')
+            return
+        self._stop_programma("Gestopt: startproef")
+        self._stop_startproef("Gestopt: nieuwe startproef")
+        self.inst.setdefault("emsn", {})["poort"] = poort
+        instellingen.bewaar(self.inst)
+        self.apparaat = self.maak_bordje(poort)
+        self._regels = []
+        self.apparaat.regel.connect(lambda t, r: self._regels.append(r))
+        self.apparaat.verbonden.connect(self._op_apparaat)
+        self.startproef = sp_mod.Startproef(n, uit_s, aan_s, volt=min(sp_mod.VOLT, self.project.vmax),
+                                            amp=min(sp_mod.AMP, self.project.imax))
+        self.apparaat.start()
+        self._voer_uit(self.startproef.start(time.time()))
+        if self.sp_venster is not None:
+            self.sp_venster.begonnen()
+        self._toon_proef()
+
+    def _op_apparaat(self, open_: bool, tekst: str) -> None:
+        if self.startproef is not None:
+            self.startproef.poort(time.time(), open_, tekst)
+        self.l_voet.setText(f"bordje: {'poort open' if open_ else 'poort weg'} ({tekst})")
+
+    def _stop_startproef(self, reden: str) -> None:
+        sp, self.startproef = self.startproef, None
+        ap, self.apparaat = self.apparaat, None
+        if ap is not None:
+            ap.stop()
+        if sp is None:
+            return
+        t1 = time.time()
+        tekst = sp.afronden(reden, t1)
+        self.markeer("EMSN-auto: " + reden.lower())
+        pts = self.geschiedenis.tussen(sp.t_start, t1)
+        markers = [(t, x) for t, x in self.uitgebreid.grafiek.markers if sp.t_start <= t <= t1]
+        toelichting = (f"{len(sp.rijen)} starts op {nl(sp.volt, 2)} V (grens {nl(sp.amp, 1)} A), uit {sp.uit_s:g} s, "
+                       f"aan {sp.aan_s:g} s. Per start de i2c-keuring uit de seriële log en de stroom na 3, 10 en 30 s.")
+        pagina = rapport_mod.maak("EMSN-auto startproef: " + sp.naam, pts, markers, apparaat=self.l_apparaat.text(),
+                                  project=self.project.naam, v_set=sp.volt, i_set=sp.amp, oordeel=tekst,
+                                  oordeel_klasse=sp.oordeel, toelichting=toelichting, soort="startproef",
+                                  extra_html=sp_mod.tabel_html(sp))
+        pad = rapport_mod.bewaar(pagina, "emsn_starts")
+        self.werkboek.voeg("startproef", "EMSN-auto startproef: " + tekst, pad, toelichting)
+        self.l_voet.setText(f"rapport: {pad.name}")
+        if self.sp_venster is not None:
+            self.sp_venster.klaar(sp, pad)
+        self._toon_proef()
+        webbrowser.open(pad.resolve().as_uri())
+
     def _tik(self) -> None:
+        if self.startproef is not None:
+            regels, self._regels = self._regels, []
+            self._voer_uit(self.startproef.tik(time.time(), self.laatste_meting, regels))
+            if self.startproef.klaar:
+                self._stop_startproef("Klaar")
+            else:
+                if self.sp_venster is not None:
+                    self.sp_venster.toon(self.startproef)
+                self._toon_proef()
         if self.loop is not None:
             self._voer_uit(self.loop.tik(time.time(), self.laatste_meting))
             if self.loop.klaar:
@@ -489,6 +581,7 @@ class Hoofdvenster(QMainWindow):
 
     def noodstop(self) -> None:
         self._stop_programma("NOODSTOP")
+        self._stop_startproef("NOODSTOP")
         if self.werker is not None:
             self.werker.opdracht(self.voeding.zet_uitgang, False)
         self.l_voet.setText(f"NOODSTOP {datetime.now():%H:%M:%S}: uitgang uit")
@@ -543,6 +636,8 @@ class Hoofdvenster(QMainWindow):
                 self.werker.opdracht(self.voeding.zet_uitgang, False)
                 QApplication.processEvents()
                 time.sleep(0.3)
+        if self.startproef is not None:
+            self._stop_startproef("Gestopt: paneel gesloten")
         if self.werker is not None:
             self.werker.stop()
         self.log.stop()

@@ -26,7 +26,7 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 - [x] Energieteller sinds een moment (mAh, Wh, duur), op nul te zetten.
 - [x] "Stroom in beeld": hoogste, gemiddelde, laagste, lading in het zichtbare venster (1, 5, 30 min).
 - [ ] Piep bij langer dan een halve seconde begrenzen (CC), uit te zetten.
-- [ ] Scherp op schaal 150/200 % (DPI-bewust), vensters binnen het scherm houden.
+- [x] Scherp op schaal 150/200 % (DPI-bewust), vensters binnen het scherm houden.
 
 ## Bediening
 
@@ -55,10 +55,10 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 ## Testprogramma's
 
-- [ ] Stappen met sprong of helling, spanning, stroomgrens, uitgang aan/uit, duur; herhalen; uit na afloop.
-- [ ] Verwachting per stap: gemiddelde stroom tussen grenzen vanaf … s, en/of een melding van de monitor.
-- [ ] Opslaan, openen (`testprogrammas/*.json`, `laatste.json`), duur ook als ':30' of '45 s'.
-- [ ] Uitslag na afloop: hoeveel controles goed, in grafiek, rapport en melding.
+- [x] Stappen met sprong of helling, spanning, stroomgrens, uitgang aan/uit, duur; herhalen; uit na afloop.
+- [x] Verwachting per stap: gemiddelde stroom tussen grenzen vanaf … s, en/of een melding van de monitor.
+- [x] Opslaan, openen (`testprogrammas/*.json`, `laatste.json`), duur ook als ':30' of '45 s'.
+- [x] Uitslag na afloop: hoeveel controles goed, in grafiek, rapport en melding.
 
 ## Projecten
 
@@ -79,7 +79,7 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 
 ### EMSN-auto (T-Beam, seriële log op COM6)
 
-- [ ] Startproef "Bordje: N starts" (uit/aan, i2c-keuring goed/dood/half, stroom na 3/10/30 s, poort sluiten
+- [x] Startproef "Bordje: N starts" (uit/aan, i2c-keuring goed/dood/half, stroom na 3/10/30 s, poort sluiten
       vóór uit en terugzoeken na aan; rapport; werkboek).
 - [ ] Programma's: auto aan-uit (20x), laadt het (30 min), wiebelende stekker.
 
@@ -113,7 +113,7 @@ Legenda: `[ ]` nog te bouwen, `[x]` klaar in het nieuwe paneel, `[~]` anders opg
 - [x] Indelingen: Eenvoudig, Uitgebreid, Meetbank, Presentatie, Mini; onthouden per project.
 - [ ] Thema's donker/licht, accentkleur, kleurenblindveilig (status nooit alleen met kleur).
 - [ ] Toetsen: Esc noodstop, spatie uitgang, pijltjes spanning, cijfers geheugen; Ctrl+K zoekvenster.
-- [ ] Proeven als één systeem met een "apparaat onder test" (wifi of seriële log).
+- [x] Proeven als één systeem met een "apparaat onder test" (wifi of seriële log).
 - [ ] Stappen-editor met voorbeeldgrafiek; opnamestand.
 - [ ] Accu nabootsen 2.0 (ontlaadkrommen lood/LiFePO₄/Li-ion, inwendige-weerstandsproef).
 - [ ] Logboek in SQLite, met CSV-export.

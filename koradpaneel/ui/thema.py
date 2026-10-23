@@ -71,6 +71,16 @@ QPushButton#menu:hover {{ background: {t.kaart}; }}
 QLineEdit {{ background: {t.veld}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px;
              padding: 10px 12px; font-family: {t.cijfers}; font-size: 18px; selection-background-color: {t.accent}; }}
 QLineEdit:focus {{ border-color: {t.accent}; }}
+QSpinBox, QDoubleSpinBox {{ background: {t.veld}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px;
+             padding: 8px 10px; font-family: {t.cijfers}; font-size: 16px; selection-background-color: {t.accent}; }}
+QSpinBox:focus, QDoubleSpinBox:focus {{ border-color: {t.accent}; }}
+QTableWidget {{ background: {t.kaart}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 10px;
+                gridline-color: {t.kaart_rand}; font-family: {t.cijfers}; font-size: 13px; }}
+QTableWidget::item {{ padding: 4px 8px; border-bottom: 1px solid {t.kaart_rand}; }}
+QHeaderView::section {{ background: {t.kaart}; color: {t.inkt_zacht}; border: 0; border-bottom: 1px solid {t.kaart_rand};
+                        padding: 6px 8px; font-weight: 600; }}
+QDialog {{ background: {t.grond}; }}
+QProgressBar {{ border: 0; }}
 QComboBox {{ background: {t.kaart}; color: {t.inkt}; border: 1px solid {t.kaart_rand}; border-radius: 8px;
              padding: 7px 12px; }}
 QComboBox QAbstractItemView {{ background: {t.kaart}; color: {t.inkt}; selection-background-color: {t.accent}; }}

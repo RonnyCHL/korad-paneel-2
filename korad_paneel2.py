@@ -4,7 +4,8 @@
     py korad_paneel2.py                       de Korad op de poort uit de instellingen (of zelf zoeken)
     py korad_paneel2.py --poort COM10
     py korad_paneel2.py --nagebootst          zonder voeding: de nagebootste, met een gewone belasting
-    py korad_paneel2.py --nagebootst tbeam    ... met het T-Beam-bordje als belasting (zie voeding/nagebootst.py)
+    py korad_paneel2.py --nagebootst tbeam    ... met het T-Beam-bordje als belasting (zie voeding/nagebootst.py);
+                                              de startproef leest dan een nagebootst bordje (elke derde start dood)
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import sys
 
 from PySide6.QtWidgets import QApplication
 
+from koradpaneel.apparaat.bordje import Bordje, NagebootstBordje
 from koradpaneel.ui.hoofdvenster import Hoofdvenster
 from koradpaneel.voeding import korad, nagebootst
 
@@ -31,9 +33,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if a.nagebootst:
         maak = lambda _poort: nagebootst.Nagebootst(a.nagebootst)
+        maak_bordje = lambda _poort: NagebootstBordje("wissel")
     else:
         maak = lambda poort: korad.Korad(a.poort or poort or "COM10")
-    venster = Hoofdvenster(maak)
+        maak_bordje = lambda poort: Bordje(poort)
+    venster = Hoofdvenster(maak, maak_bordje=maak_bordje)
     venster.show()
     return app.exec()
 
