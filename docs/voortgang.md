@@ -25,6 +25,11 @@ Gebouwd en vastgelegd (zie `git log`):
    Testprogramma's (Ctrl+P) met voorbeeldgrafiek; de loop draait in het paneel met markeringen per stap, de kaart
    "Lopende proef", en een rapport met de uitslag na afloop. 27 toetsen.
 
+7. **23-10, ochtend, eerste keer aan de echte Korad**: het venster liep rechts en onder uit beeld. Gemeten: de
+   kopbalk eiste 1523 px (menubalk MinimumExpanding + de lange *IDN?), het venster 1440x900 op een werkruimte van
+   1440x852. Verholpen (commit b3fd6b9): menubalk Preferred, apparaatnaam afgekapt, venster passend en onthouden,
+   rolgebied als vangnet, kleinere minimummaten voor de meters.
+
 Schermafdrukken maken zonder het venster op het scherm te zetten: `py tests/schermafdruk.py tbeam uit.png
 [eenvoudig|uitgebreid|meetbank|presentatie] [ms]`.
 
