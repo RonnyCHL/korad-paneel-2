@@ -48,6 +48,11 @@ class Rij:
     poort_s: float | None = None                # na hoeveel seconden de poort terug was
     boot_s: float | None = None                 # na hoeveel seconden de eerste regel kwam
     resets: int = 0                             # herstarts van de ROM-bootloader in deze start
+    redenen: dict = field(default_factory=dict) # reden van die herstarts -> aantal (RTCWDT_RTC_RESET, BROWNOUT_RST, ...)
+    log: list = field(default_factory=list)     # de ruwe seriële regels van deze start, met de seconde erbij
+
+
+LOG_MAX = 600                                   # regels per start die we bewaren voor het rapport
 
 
 class Startproef(Proef):
@@ -118,8 +123,12 @@ class Startproef(Proef):
             mv = VERSIE.search(regel)
             if mv:
                 self.fw = mv.group(1)
-            if RESET.search(regel):
+            if len(rij.log) < LOG_MAX and regel.strip():
+                rij.log.append(f"{el:5.1f}  {regel.strip()}")
+            mr = RESET.search(regel)
+            if mr:
                 rij.resets += 1
+                rij.redenen[mr.group(1)] = rij.redenen.get(mr.group(1), 0) + 1
             mk = KEURING.search(regel) or STATUS_I2C.search(regel)
             if mk and not rij.keuring:
                 rij.keuring = mk.group(1).strip()
@@ -139,7 +148,8 @@ class Startproef(Proef):
     def _rij_klaar(self, rij: Rij) -> None:
         if not rij.keuring:
             if rij.resets >= 3 and rij.boot_s is not None:
-                rij.keuring = f"(herstartlus: {rij.resets} herstarts, geen boot-log)"
+                redenen = ", ".join(f"{k} {n}x" for k, n in sorted(rij.redenen.items(), key=lambda kv: -kv[1]))
+                rij.keuring = f"(herstartlus: {rij.resets} herstarts: {redenen}; geen boot-log)"
                 rij.oordeel = "lus"
             elif not self.poort_open and rij.poort_s is None:
                 rij.keuring = f"(geen seriële poort: {(self.poort_fout or '?')[:50]})"
@@ -225,6 +235,18 @@ def tabel_html(sp: Startproef) -> str:
     uitleg = ("goed = AXP2101, MPU-6050 en BME680 antwoorden; dood = de laadchip (0x34) zwijgt, het bordje slaapt "
               "dan niet en laadt niet; half = een van de sensoren ontbreekt; herstartlus = de ROM-bootloader "
               "herstart steeds (de 3,3 V valt weg) en de firmware komt niet aan het woord.")
+    # De ruwe seriële log per start, zodat een herstartlus of een stil bordje achteraf te lezen is. Mislukte starts
+    # staan opengeklapt, goede dichtgeklapt; na LOG_MAX regels houdt het op (een lus praat eindeloos).
+    logs = []
+    for r in sp.rijen:
+        if not r.log:
+            continue
+        open_ = " open" if r.oordeel != "goed" else ""
+        tekst = esc("\n".join(r.log))
+        meer = f"\n... (meer dan {LOG_MAX} regels, de rest is weggelaten)" if len(r.log) >= LOG_MAX else ""
+        logs.append(f"<details{open_}><summary>start {r.nr}: {esc(r.oordeel)}, {len(r.log)} regels</summary>"
+                    f"<pre>{tekst}{esc(meer)}</pre></details>")
+    log_html = f"<h2>Seriële log per start</h2>{''.join(logs)}" if logs else ""
     return (f"<h2>Per start</h2><table><tr><th>#</th><th>Boot</th><th>Poort</th>{kop}"
             f"<th>i2c-keuring (uit de seriële log)</th></tr>{''.join(rijen)}</table>"
-            f"<p class='meta'>{uitleg}</p>")
+            f"<p class='meta'>{uitleg}</p>{log_html}")

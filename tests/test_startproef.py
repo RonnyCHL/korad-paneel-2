@@ -79,6 +79,11 @@ def test_herstartlus_en_geen_poort():
         tik(sp, t, Meting(t, 5.0, 0.05), rom)
     tik(sp, 33.0, Meting(33.0, 5.0, 0.05), [])
     assert sp.rijen[0].oordeel == "lus" and sp.rijen[0].resets == 4
+    assert "POWERON_RESET 4x" in sp.rijen[0].keuring            # de reden staat erbij (24-10)
+    assert len(sp.rijen[0].log) == 12 and sp.rijen[0].log[1].endswith("rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)")
+    from koradpaneel.kern.startproef import tabel_html
+    h = tabel_html(sp)
+    assert "Seriële log per start" in h and "<details open>" in h and "entry 0x400805e4" in h
     sp.poort(33.1, False, "pauze")
     tik(sp, 34.0, None, [])
     sp.poort(35.0, False, "could not open port 'COM6'")
